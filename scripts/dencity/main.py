@@ -1,7 +1,7 @@
 
 
 def main_calculation(file_name, area, resolution, cov):
-
+    print("")
     #gausian_dencity = get_gaussian_grid(5 ,5 ,0.5)
 
     # read vadere output file from disk
