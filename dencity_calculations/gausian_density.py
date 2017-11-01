@@ -1,8 +1,31 @@
 import numpy as np
-from dencity_calculations.parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, write_to_file, \
-    sort_data
+from dencity_calculations.parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, \
+                                                        sort_data, write_matrix_file
+from dencity_calculations.density_plot_tests import test_density_data
 
-dir = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\output\\"
+
+# constants
+SIGMA = 0.7 # for gaussian dist
+PED_RADIUS = 4 # more neighbourhood for ped TODO make dependent on resolution so that scale is correct!
+
+
+# ----------------------------------------------------------------------
+# generates a vector of matrixes each containing the density data for one timestep
+# @param data trajectories
+# @param resolution of the density image
+# @area ((cp_x,cp_y)(width,height)) corner point of the measurement field referencing to c.sys. of complete scenario
+#       and area of the measurement field
+def calculate_dencity_timeseries(data, area, resolution):
+    size = (int(area[1][0] / resolution), int(area[1][1] / resolution))
+    density_field = generate_gaussian_grid(PED_RADIUS)
+
+    matrix = np.zeros(size)
+    for timestep in data:
+        for ped in timestep:
+            calculate_gaussian_density(ped, matrix, density_field, area, resolution)
+
+        write_matrix_file(DIRECTORY,matrix,timestep[0][0]) # write matrix for last timestep to file
+        matrix = np.zeros(size)  # new matrix
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,10 +39,8 @@ def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
     origin_y = area[0][1]
     width = int(area[1][0] / resolution)
     height = int(area[1][1] / resolution)
-    diff_x = int(
-        ped[X_POS_INDEX]) / resolution - origin_x  # TODO do not cast to int -> divide pedestrian density proportionally
-    diff_y = int(
-        ped[Y_POS_INDEX]) / resolution - origin_y  # TODO do not cast to int -> divide pedestrian density proportionally
+    diff_x = int(np.round(ped[X_POS_INDEX]/ resolution- origin_x,0))    # TODO do not round -> divide pedestrian density %
+    diff_y = int(np.round(ped[Y_POS_INDEX]/ resolution- origin_y,0))    # TODO do not round -> divide pedestrian density %
 
     left_bound = int(max(0, diff_x - radius))
     right_bound = int(min(diff_x + radius, width - 1))
@@ -30,7 +51,6 @@ def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
     for y in range(lower_bound, upper_bound + 1):
 
         i = max(0, radius - diff_x)
-
         for x in range(left_bound, right_bound + 1):
             matrix[height - 1 - y][x] += density_field[size[1] - 1 - j][i]
             i += 1
@@ -38,39 +58,7 @@ def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
         j += 1
 
 
-# ----------------------------------------------------------------------
-# generates a vector of matrixes each containing the density data for one timestep
-# @param data trajectories
-# @param resolution of the density image
-# @area ((cp_x,cp_y)(width,height)) corner point of the measurement field referencing to c.sys. of complete scenario
-#       and area of the measurement field
-
-def generate_matrices(data, resolution, area):
-    size = (int(area[1][0] / resolution), int(area[1][1] / resolution))
-    matrix_vec = []
-
-    timestamp = 1
-    matrix = np.zeros(size)
-
-    density_field = generate_gaussian_grid(radius=2)
-
-    for ped in data:
-
-        if ped[0] == timestamp:
-            calculate_gaussian_density(ped, matrix, density_field, area, resolution)
-        elif (ped[0]) == (timestamp + 1):  # next timestamp
-            matrix_vec.append(matrix)
-            matrix = np.zeros(size)  # neue matrix
-            calculate_gaussian_density(ped, matrix, density_field, area, resolution)
-            timestamp += 1
-
-    matrix_vec.append(matrix)  # append last time step
-
-    return matrix_vec
-
-
-# ---------------------------------------------------------------------------
-
+# ----------------------------------------------------------------------------------------------------------------------
 # gaussian dist, Fromular from Wikipedia
 def gaussian(x, a, b, c):
     return a * np.exp(- (x - b) ** 2 / 2 * c ** 2)
@@ -88,36 +76,33 @@ def generate_gaussian_grid(radius):
 
     for i in range(0, side):
         for j in range(0, side):
-            grid[i, j] = gaussian_distribution(np.array([0, 0]), np.array(np.abs([i - radius, j - radius])), sigma=0.7)
+            grid[i, j] = gaussian_distribution(np.array([0, 0]), np.array(np.abs([i - radius, j - radius])), SIGMA)
 
     return grid
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 def main_gausian_density(file_name, area, resolution):
-    # gasian_density = get_gaussian_grid(5, 5, 0.5)
-
-    # read vadere output file from disk
-
-    data_raw = read_data(file_name)
-
-    # convert to numeric data
-    data_converted = convert_data(data_raw)
-
-    # cut area to observe
-    # data_area = extract_area(data_converted, area)
-
-    # calculate a vector containing a density matrix for each timestep
-    density_time_series = generate_matrices(data_converted, resolution, area)
-
-    write_to_file(density_time_series)
 
 
-    # 5) compute density
-    # 5.1) compute gaussian density
-    # 5.2) compute counting density
+    if True:
+        # read vadere output file from disk
+        data_raw = read_data(file_name)
 
+        # convert to numeric data
+        data_converted = convert_data(data_raw)
+
+        # TODO cut area to observe
+        # data_area = extract_area(data_converted, area)
+
+        data_sorted = sort_data(data_converted, framerate=10)
+        # calculate a vector containing a density matrix for each timestep
+        calculate_dencity_timeseries(data_sorted, area, resolution)
+
+    test_density_data(DIRECTORY,False)
 
 area = ((0, 0), (50, 50))
 resolution = 0.1
-file = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\testdata\\test.txt"
+DIRECTORY = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\output\\"
+file = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\testdata\\postvis.trajectories"
 main_gausian_density(file, area, resolution)

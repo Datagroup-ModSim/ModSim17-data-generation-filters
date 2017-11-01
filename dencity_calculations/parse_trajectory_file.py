@@ -25,13 +25,13 @@ STRIDE_LENGTH_INDEX = 9
 
 
 def convert_row(row):
-    row_list = row[0].split(';')
+    row_list = row[0].split(' ')
 
     # cast each col element
     timeStep = int(row_list[0])
     pedestrianId = int(row_list[1])
-    # x = float(row_list[2])
-    # y = float(row_list[3])
+    x = float(row_list[2])
+    y = float(row_list[3])
     # velocity = float(row_list[4])
     # countingDensity = float(row_list[5])
     # gaussianDensity = float(row_list[6])
@@ -40,7 +40,7 @@ def convert_row(row):
     # strideLength = float(row_list[9])
 
     # specify output format, which cols are needed?
-    return [timeStep, pedestrianId]  # x, y, velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
+    return [timeStep, pedestrianId, x, y] #, velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
 
 
 def read_data(path):
