@@ -73,8 +73,8 @@ def convert_data(data):
 def extract_area(data, x, y, width, height):
     # extract rectangular area from given scenario,
     # where x and y is the bottom left corner of observation area
-    return [row for row in data if (x <= row[X_POS_INDEX] <= (x + width)) and
-            (y <= row[Y_POS_INDEX] <= (y + height))]
+    return np.array([row for row in data if (x <= row[X_POS_INDEX] <= (x + width)) and
+     (y <= row[Y_POS_INDEX] <= (y + height))])
 
 
 def sort_data(data, framerate):

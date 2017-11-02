@@ -1,18 +1,14 @@
 import numpy as np
 import csv
+from dencity_calculations.gausian_density import gaussian_distribution
 
 # ----------------------------------------------------------------------------------------------------------------------
 # this file is just for trying stuff out
 # ----------------------------------------------------------------------------------------------------------------------
 
-data = [[1, 2, 3], [1, 2, 3], [1, 2, 3], [2, 4, 8], [2, 5, 9], [3, 5, 7]]
+def gaussian(x, a, b, c):
+    return np.exp(- (x - b) ** 2 / 2 * c ** 2)
 
-data = np.array(data)
-
-
-data[2,2] = 100
-
-print(data)
 
 
 

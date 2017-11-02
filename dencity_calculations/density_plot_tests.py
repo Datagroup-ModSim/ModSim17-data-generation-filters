@@ -50,12 +50,13 @@ def plot_density(data, file_dir, filename, resize):
     s = data.shape
     img = Image.new('RGB', s)
 
+    max_data = np.max(data)
+
     for i in range(0, s[0]):
         for j in range(0, s[1]):
-
-            bw = np.uint8(255 - 255 * data[i][j])
-
-            img.putpixel((i, j), (bw, bw, bw))
+            val = data[i][j]
+            bw = np.uint8(255-(val*255)/(max_data) )
+            img.putpixel((j, i), (bw, bw, bw))
 
     if resize:
         img = img.resize((s[0] * 10, s[1] * 10))
