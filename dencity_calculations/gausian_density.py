@@ -1,7 +1,7 @@
 import numpy as np
-from dencity_calculations.parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, \
-                                                        sort_data, write_matrix_file
-from dencity_calculations.density_plot_tests import test_density_data
+from parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, \
+                                                        sort_data, write_matrix_file #,calc_targets
+from density_plot_tests import test_density_data
 
 
 # constants
@@ -95,7 +95,7 @@ def main_gausian_density(file_name, area, resolution):
         # TODO cut area to observe
         # data_area = extract_area(data_converted, area)
 
-        data_sorted = sort_data(data_converted, framerate=10)
+        data_sorted, distribution = sort_data(data_converted, framerate=10)
         # calculate a vector containing a density matrix for each timestep
         calculate_dencity_timeseries(data_sorted, area, resolution)
 
@@ -103,6 +103,6 @@ def main_gausian_density(file_name, area, resolution):
 
 area = ((0, 0), (50, 50))
 resolution = 0.1
-DIRECTORY = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\output\\"
-file = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\testdata\\postvis.trajectories"
+DIRECTORY = "C:\\Users\\Anita\\Documents\\HM\\ModellierungsseminarDateien\\output\\"
+file = "C:\\Users\\Anita\\Documents\\HM\\GruppeDatenerzeugung\\testdata\\postvis.trajectories"
 main_gausian_density(file, area, resolution)

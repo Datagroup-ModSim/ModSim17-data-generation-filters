@@ -32,6 +32,7 @@ def convert_row(row):
     pedestrianId = int(row_list[1])
     x = float(row_list[2])
     y = float(row_list[3])
+    targetID = int(row_list[4])
     # velocity = float(row_list[4])
     # countingDensity = float(row_list[5])
     # gaussianDensity = float(row_list[6])
@@ -40,7 +41,7 @@ def convert_row(row):
     # strideLength = float(row_list[9])
 
     # specify output format, which cols are needed?
-    return [timeStep, pedestrianId, x, y] #, velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
+    return [timeStep, pedestrianId, x, y, targetID]  # , velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
 
 
 def read_data(path):
@@ -79,11 +80,17 @@ def extract_area(data, x, y, width, height):
 def sort_data(data, framerate):
     end_time = int(data[-1][0])
     data_sorted = []
+    targets = list(set(data[:, 4]))
+    distribution = []
     for time in range(0, end_time):
         if time % framerate == 0:
             data_sorted.append(data[data[:, 0] == time, :])
-
-    return np.array(data_sorted[1::])  # TODO fix: empty array at pos 0 after sorting
+            tmp = data[data[:, 0] == time, 4]
+            current = []
+            for target in range(0, len(targets)):
+                current.append((tmp == targets[target]).sum()/len(tmp))
+            distribution.append(current)
+    return np.array(data_sorted[1::]), distribution[1:]  # TODO fix: empty array at pos 0 after sorting
 
 
 def order_chronological(data):
