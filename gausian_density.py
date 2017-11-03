@@ -4,7 +4,7 @@ import numpy as np
 from density_plot_tests import test_density_data
 
 from parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, \
-    sort_data, write_matrix_file
+    sort_data, write_matrix_file, extract_area
 
 # constants
 SIGMA = 0.7  # for gaussian dist
@@ -115,7 +115,7 @@ def main_gausian_density(file_name, area, resolution):
         data_converted = convert_data(data_raw)
 
         # cut area to observe
-        #data_area = extract_area(data_converted, area[0][0],area[0][1],area[1][0],area[1][1])
+        data_area = extract_area(data_converted, area[0][0],area[0][1],area[1][0],area[1][1])
 
         data_sorted, distribution = sort_data(data_converted, framerate=10)
 
