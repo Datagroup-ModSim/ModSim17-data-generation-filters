@@ -1,13 +1,13 @@
+import os
+
 import numpy as np
+from density_plot_tests import test_density_data
 
-from dencity_calculations.parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, \
-    sort_data, write_matrix_file, extract_area
-from dencity_calculations.density_plot_tests import test_density_data
-
+from parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, \
+    sort_data, write_matrix_file
 
 # constants
 SIGMA = 0.7  # for gaussian dist
-PED_RADIUS = 4  # more neighbourhood for ped TODO make dependent on resolution so that scale is correct!
 START = 2
 STOP = 2
 
@@ -115,18 +115,20 @@ def main_gausian_density(file_name, area, resolution):
         data_converted = convert_data(data_raw)
 
         # cut area to observe
-        data_area = extract_area(data_converted, area[0][0],area[0][1],area[1][0],area[1][1])
+        #data_area = extract_area(data_converted, area[0][0],area[0][1],area[1][0],area[1][1])
 
-        data_sorted = sort_data(data_area, framerate=10)
+        data_sorted, distribution = sort_data(data_converted, framerate=10)
 
         # calculate a vector containing a density matrix for each timestep
         calculate_dencity_timeseries(data_sorted, area, resolution)
 
         test_density_data(DIRECTORY, False)
 
-
-area = ((20,2),(10,10))
+#area = ((25,2),(10,10))
+area = ((0,0),(50,50))
 resolution = 0.1
-DIRECTORY = "C:\\Users\\Anita\\Documents\\HM\\ModellierungsseminarDateien\\output\\"
-file = "C:\\Users\\Anita\\Documents\\HM\\GruppeDatenerzeugung\\testdata\\postvis.trajectories"
+
+DIRECTORY = os.path.join(os.path.dirname(__file__), "output\\")
+file = os.path.join(os.path.dirname(__file__),"testdata\\postvis.trajectories")
+
 main_gausian_density(file, area, resolution)

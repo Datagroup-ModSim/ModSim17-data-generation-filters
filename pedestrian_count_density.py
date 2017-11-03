@@ -1,13 +1,11 @@
-import numpy as np
 import math
-from PIL import Image
-import csv
-import os
-import glob
-from dencity_calculations.parse_trajectory_file import write_matrix_file, X_POS_INDEX, Y_POS_INDEX, \
+
+import numpy as np
+from density_plot_tests import test_density_data
+
+from parse_trajectory_file import write_matrix_file, X_POS_INDEX, Y_POS_INDEX, \
     read_data, convert_data, sort_data
 
-from dencity_calculations.density_plot_tests import test_density_data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Pedestrian count density

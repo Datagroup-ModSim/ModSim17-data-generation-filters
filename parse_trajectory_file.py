@@ -25,14 +25,14 @@ STRIDE_LENGTH_INDEX = 9
 
 
 def convert_row(row):
-    row_list = row[0].split(' ')
+    #row_list = row[0].split(' ')
 
     # cast each col element
-    timeStep = int(row_list[0])
-    pedestrianId = int(row_list[1])
-    x = float(row_list[2])
-    y = float(row_list[3])
-    targetID = int(row_list[4])
+    timeStep = int(row[0])
+    pedestrianId = int(row[1])
+    x = float(row[2])
+    y = float(row[3])
+    targetID = int(row[4])
     # velocity = float(row_list[4])
     # countingDensity = float(row_list[5])
     # gaussianDensity = float(row_list[6])
@@ -41,12 +41,13 @@ def convert_row(row):
     # strideLength = float(row_list[9])
 
     # specify output format, which cols are needed?
-    return [timeStep, pedestrianId, x, y, targetID]  # , velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
+
+    return list([timeStep, pedestrianId, x, y, targetID]) # , velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
 
 
 def read_data(path):
-    f = open(path)
-    reader = csv.reader(f)
+    f = open(path, newline='\n',)
+    reader = csv.reader(f, delimiter=' ')
     data = []
     for row in reader:
         data.append(row)
@@ -73,16 +74,18 @@ def convert_data(data):
 def extract_area(data, x, y, width, height):
     # extract rectangular area from given scenario,
     # where x and y is the bottom left corner of observation area
-    return np.array([row for row in data if (x <= row[X_POS_INDEX] <= (x + width)) and
+    return list([row for row in data if (x <= row[X_POS_INDEX] <= (x + width)) and
      (y <= row[Y_POS_INDEX] <= (y + height))])
 
 
 def sort_data(data, framerate):
+    data = np.array(data)
     end_time = int(data[-1][0])
     data_sorted = []
-    targets = list(set(data[:, 4]))
+    #targets = list(set(data[:, 4]))
+    targets = data[:,4]
     distribution = []
-    for time in range(0, end_time):
+    for time in range(1, end_time):
         if time % framerate == 0:
             data_sorted.append(data[data[:, 0] == time, :])
             tmp = data[data[:, 0] == time, 4]
@@ -90,7 +93,7 @@ def sort_data(data, framerate):
             for target in range(0, len(targets)):
                 current.append((tmp == targets[target]).sum()/len(tmp))
             distribution.append(current)
-    return np.array(data_sorted[1::]), distribution[1:]  # TODO fix: empty array at pos 0 after sorting
+    return data_sorted, distribution
 
 
 def order_chronological(data):
