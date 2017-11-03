@@ -9,7 +9,8 @@ def gaussian(x, a, b, c):
     return np.exp(- (x - b) ** 2 / 2 * c ** 2)
 
 
+test = np.array([[1,2,3,2],[8,2,3,2]])
 
-
+print(test[:,0])
 
 

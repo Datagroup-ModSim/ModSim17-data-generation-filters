@@ -42,9 +42,9 @@ def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
     width = int(area[1][0] / resolution)
     height = int(area[1][1] / resolution)
     diff_x = int(
-        np.round(ped[X_POS_INDEX] / resolution - origin_x, 0))  # TODO do not round -> divide pedestrian density %
+        np.round((ped[X_POS_INDEX] - origin_x)/resolution , 0))  # TODO do not round -> divide pedestrian density %
     diff_y = int(
-        np.round(ped[Y_POS_INDEX] / resolution - origin_y, 0))  # TODO do not round -> divide pedestrian density %
+        np.round((ped[Y_POS_INDEX] - origin_y)/resolution , 0))  # TODO do not round -> divide pedestrian density %
 
     left_bound = int(max(0, diff_x - radius))
     right_bound = int(min(diff_x + radius, width - 1))
@@ -117,15 +117,15 @@ def main_gausian_density(file_name, area, resolution):
         # cut area to observe
         data_area = extract_area(data_converted, area[0][0],area[0][1],area[1][0],area[1][1])
 
-        data_sorted, distribution = sort_data(data_converted, framerate=10)
+        data_sorted = sort_data(data_area, framerate=10)
 
         # calculate a vector containing a density matrix for each timestep
         calculate_dencity_timeseries(data_sorted, area, resolution)
 
         test_density_data(DIRECTORY, False)
 
-#area = ((25,2),(10,10))
-area = ((0,0),(50,50))
+area = ((20,5),(10,10))
+#area = ((0,0),(50,50))
 resolution = 0.1
 
 DIRECTORY = os.path.join(os.path.dirname(__file__), "output\\")

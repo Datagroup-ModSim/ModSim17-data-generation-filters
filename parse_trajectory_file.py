@@ -42,7 +42,7 @@ def convert_row(row):
 
     # specify output format, which cols are needed?
 
-    return list([timeStep, pedestrianId, x, y, targetID]) # , velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
+    return [timeStep, pedestrianId, x, y, targetID] # , velocity, countingDensity, gaussianDensity, flow, overlaps, strideLength]
 
 
 def read_data(path):
@@ -68,32 +68,44 @@ def write_to_file(data_vec):
 
 def convert_data(data):
     data = data[1:len(data)]  # remove column labels in first row
-    return np.array(list(map(convert_row, data)))  # use list to evaluate mapping
+    return list(map(convert_row, data)) # use list to evaluate mapping
 
 
 def extract_area(data, x, y, width, height):
     # extract rectangular area from given scenario,
     # where x and y is the bottom left corner of observation area
-    return list([row for row in data if (x <= row[X_POS_INDEX] <= (x + width)) and
+    return ([row for row in data if (x <= row[X_POS_INDEX] <= (x + width)) and
      (y <= row[Y_POS_INDEX] <= (y + height))])
 
+
+def sort_data2(data, framerate):
+    data = np.array(data)
+    end_time = int(data[-1][0])
+    data_sorted = []
+    #targets = list(set(data[:, 4]))
+    #targets = data[:,4]
+    #distribution = []
+    for time in range(1, end_time):
+        if time % framerate == 0:
+            data_sorted.append(data[data[:, 0] == time, :])
+            #tmp = data[data[:, 0] == time, 4]
+            #current = []
+            #for target in range(0, len(targets)):
+            #    current.append((tmp == targets[target]).sum()/len(tmp))
+            #distribution.append(current)
+    return np.array(data_sorted) #np.array(distribution)
 
 def sort_data(data, framerate):
     data = np.array(data)
     end_time = int(data[-1][0])
     data_sorted = []
-    #targets = list(set(data[:, 4]))
-    targets = data[:,4]
-    distribution = []
     for time in range(1, end_time):
         if time % framerate == 0:
-            data_sorted.append(data[data[:, 0] == time, :])
-            tmp = data[data[:, 0] == time, 4]
-            current = []
-            for target in range(0, len(targets)):
-                current.append((tmp == targets[target]).sum()/len(tmp))
-            distribution.append(current)
-    return data_sorted, distribution
+            tmp = data[:,0]
+            data_sorted.append(np.array(data[data[:,0] == time, :]))
+
+    return (np.array(data_sorted)) # TODO fix: empty array at pos 0 after sorting
+
 
 
 def order_chronological(data):
