@@ -4,12 +4,13 @@ import numpy as np
 from density_plot_tests import test_density_data
 
 from parse_trajectory_file import X_POS_INDEX, Y_POS_INDEX, read_data, convert_data, \
-    sort_data, write_matrix_file, extract_area
+    sort_data, write_matrix_file, extract_area, get_file_names
 
 # constants
 SIGMA = 0.7  # for gaussian dist
 START = 2
 STOP = 2
+
 
 # ----------------------------------------------------------------------
 # generates a vector of matrixes each containing the density data for one timestep
@@ -17,17 +18,21 @@ STOP = 2
 # @param resolution of the density image
 # @area ((cp_x,cp_y)(width,height)) corner point of the measurement field referencing to c.sys. of complete scenario
 #       and area of the measurement field
-def calculate_dencity_timeseries(data, area, resolution):
+def calculate_dencity_timeseries(data, area, resolution, dist):
     size = (int(area[1][0] / resolution), int(area[1][1] / resolution))
     density_field = get_gaussian_grid(-START, STOP, resolution)
 
     matrix = np.zeros(size)
+    index = 0
     for timestep in data:
         for ped in timestep:
             calculate_gaussian_density(ped, matrix, density_field, area, resolution)
 
-        write_matrix_file(DIRECTORY, matrix, timestep[0][0])  # write matrix for last timestep to file
+        file_tag = str("_{0}_{1}_{2}_{3}").format(int(timestep[0][0]), \
+                                        int(dist[index][0]*100), int(dist[index][1]*100),int(dist[index][2]*100))
+        write_matrix_file(DIRECTORY, matrix, file_tag)  # write matrix for last timestep to file
         matrix = np.zeros(size)  # new matrix
+        index+=1
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -42,9 +47,9 @@ def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
     width = int(area[1][0] / resolution)
     height = int(area[1][1] / resolution)
     diff_x = int(
-        np.round((ped[X_POS_INDEX] - origin_x)/resolution , 0))  # TODO do not round -> divide pedestrian density %
+        np.round((ped[X_POS_INDEX] - origin_x) / resolution, 0))  # TODO do not round -> divide pedestrian density %
     diff_y = int(
-        np.round((ped[Y_POS_INDEX] - origin_y)/resolution , 0))  # TODO do not round -> divide pedestrian density %
+        np.round((ped[Y_POS_INDEX] - origin_y) / resolution, 0))  # TODO do not round -> divide pedestrian density %
 
     left_bound = int(max(0, diff_x - radius))
     right_bound = int(min(diff_x + radius, width - 1))
@@ -103,11 +108,32 @@ def generate_gaussian_grid(radius):
 
     return grid
 
+def get_current_dist(sorted_data):
+
+    distribution = []
+
+    for timestamp in sorted_data:
+        target_ids = np.array([0, 0, 0])
+        num_ped = len(timestamp) # anzahl personen zum momentanen zeit schritt
+        for ped in timestamp:
+            if ped[4] == 1:
+                target_ids[0]+=1
+            elif ped[4] == 2:
+                target_ids[1]+=1
+            else:
+                target_ids[2]+=1
+
+        target_ids = target_ids/num_ped
+        distribution.append(target_ids)
+
+    return distribution
 
 # ----------------------------------------------------------------------------------------------------------------------
-def main_gausian_density(file_name, area, resolution):
+def main_gausian_density(input_dir, area, resolution):
 
-    if True:
+    t_files = get_file_names(directory=input_dir)
+
+    for file_name in t_files:
         # read vadere output file from disk
         data_raw = read_data(file_name)
 
@@ -115,20 +141,23 @@ def main_gausian_density(file_name, area, resolution):
         data_converted = convert_data(data_raw)
 
         # cut area to observe
-        data_area = extract_area(data_converted, area[0][0],area[0][1],area[1][0],area[1][1])
+        data_area = extract_area(data_converted, area[0][0], area[0][1], area[1][0], area[1][1])
 
         data_sorted = sort_data(data_area, framerate=10)
 
+        dist = get_current_dist(data_sorted)
+
         # calculate a vector containing a density matrix for each timestep
-        calculate_dencity_timeseries(data_sorted, area, resolution)
+        calculate_dencity_timeseries(data_sorted, area, resolution, dist)
 
-        test_density_data(DIRECTORY, False)
+        #test_density_data(DIRECTORY, False)
 
-area = ((20,5),(10,10))
-#area = ((0,0),(50,50))
+
+#area = ((20, 5), (10, 10))
+area = ((0,0),(50,50))
 resolution = 0.1
 
 DIRECTORY = os.path.join(os.path.dirname(__file__), "output\\")
-file = os.path.join(os.path.dirname(__file__),"testdata\\postvis.trajectories")
+INPUT_DIR = os.path.join(os.path.dirname(__file__), "input_data\\")
 
-main_gausian_density(file, area, resolution)
+main_gausian_density(INPUT_DIR, area, resolution)

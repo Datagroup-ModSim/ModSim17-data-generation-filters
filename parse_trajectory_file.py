@@ -1,5 +1,7 @@
 import csv
 import numpy as np
+import os
+from glob import glob
 
 '''
 vadere output file has following format:
@@ -55,7 +57,7 @@ def read_data(path):
 
 
 def write_matrix_file(directory, matrix_out, timestep):
-    np.savetxt(directory + str("density_ped_count{0}.csv").format(timestep), matrix_out, delimiter=';', fmt='%1.4f')
+    np.savetxt(directory + str("density_gaussian{0}.csv").format(timestep), matrix_out, delimiter=';', fmt='%1.4f')
 
 
 def write_to_file(data_vec):
@@ -82,31 +84,33 @@ def sort_data2(data, framerate):
     data = np.array(data)
     end_time = int(data[-1][0])
     data_sorted = []
-    #targets = list(set(data[:, 4]))
-    #targets = data[:,4]
-    #distribution = []
+
     for time in range(1, end_time):
         if time % framerate == 0:
             data_sorted.append(data[data[:, 0] == time, :])
-            #tmp = data[data[:, 0] == time, 4]
-            #current = []
-            #for target in range(0, len(targets)):
-            #    current.append((tmp == targets[target]).sum()/len(tmp))
-            #distribution.append(current)
+
     return np.array(data_sorted) #np.array(distribution)
 
 def sort_data(data, framerate):
     data = np.array(data)
     end_time = int(data[-1][0])
     data_sorted = []
+
     for time in range(1, end_time):
         if time % framerate == 0:
-            tmp = data[:,0]
             data_sorted.append(np.array(data[data[:,0] == time, :]))
 
     return (np.array(data_sorted)) # TODO fix: empty array at pos 0 after sorting
 
 
-
 def order_chronological(data):
     return sorted(data, key=lambda row: row[TIME_STEP_INDEX])
+
+
+def get_file_names(directory):
+    os.chdir(directory)
+    file_names = []
+
+    for file in glob("**\\*.trajectories"):
+        file_names.append(file)
+    return file_names
