@@ -40,13 +40,14 @@ def read_trajectories(path, nmbr_of_files=-1):
     else:
         i_max = nmbr_of_files
     for i in range(0, i_max):
+        print(files[i])
         file = open(files[i], newline='\n')
         reader = csv.reader(file, delimiter=' ')
         scenario = []
         for row in reader:
             scenario.append(row)
         scenario_without_head = scenario[1:]
-        scenarios.extend(scenario_without_head)  # append for distinction between scenarios
+        scenarios.append(scenario_without_head)
 
     return scenarios
 
@@ -54,12 +55,12 @@ def read_trajectories(path, nmbr_of_files=-1):
 def convert_data(data):
     def convert_row(row):
         # cast each col element
-        timeStep = int(row[INDEX_TIME_STEP])
-        pedId = int(row[INDEX_PED_ID])
-        x = float(row[INDEX_POS_X])
-        y = float(row[INDEX_POS_Y])
-        targetId = int(row[INDEX_TARGET_ID])
-        return [timeStep, pedId, x, y, targetId]
+        time_step = int(row[INDEX_TIME_STEP])
+        pedestrian_id = int(row[INDEX_PED_ID])
+        pos_x = float(row[INDEX_POS_X])
+        pos_y = float(row[INDEX_POS_Y])
+        target_id = int(row[INDEX_TARGET_ID])
+        return [time_step, pedestrian_id, pos_x, pos_y, target_id]
 
     return list(map(convert_row, data))
 
@@ -70,20 +71,20 @@ def extract_observation_area(data, x, y, width, height):
 
 # number of targets hardcoded, currently 3
 # target ids hardcoded
-def calc_ped_target_dist(data):
-    targetIdCount = [0, 0, 0]
-    for ped in data:
-        if ped[INDEX_TARGET_ID] == 1:
-            targetIdCount[0] += 1
-        elif ped[INDEX_TARGET_ID] == 2:
-            targetIdCount[1] += 1
+def calculate_pedestrian_target_distribution(data):
+    target_id_counts = [0, 0, 0]
+    for row in data:
+        if row[INDEX_TARGET_ID] == 1:
+            target_id_counts[0] += 1
+        elif row[INDEX_TARGET_ID] == 2:
+            target_id_counts[1] += 1
         else:
-            targetIdCount[2] += 1
-    return [round(x / len(data),2) for x in targetIdCount]
+            target_id_counts[2] += 1
+    return [round(x / len(data),2) for x in target_id_counts]
 
 
 
-def sort_chron(data):
+def sort_chronological(data):
     data_sorted = sorted(data, key=lambda row:row[INDEX_TIME_STEP])
     current_time = data_sorted[0][INDEX_TIME_STEP]
     data_chron = []
@@ -98,10 +99,10 @@ def sort_chron(data):
             current_time += 1
     return data_chron
 
-def getDataAndTargetDist(path, scenario_count, area):
+def get_data_and_target_distribution(path, area, time_step_bound):
 
     # read trajectory files
-    data_raw = read_trajectories(path, scenario_count)
+    data_raw = read_trajectories(path, time_step_bound)
 
     # convert to numeric data
     data_converted = convert_data(data_raw)
@@ -110,9 +111,9 @@ def getDataAndTargetDist(path, scenario_count, area):
     data_observation = extract_observation_area(data_converted,
                                                 area[0], area[1], area[2], area[3])
     # sort by time step
-    data_chron = sort_chron(data_observation)
+    data_chronological = sort_chronological(data_observation)
 
     # calculate target distribution
-    target_dist = calc_ped_target_dist(data_observation)
+    target_distribution = calculate_pedestrian_target_distribution(data_observation)
 
-    return data_chron, target_dist
+    return data_chronological, target_distribution
