@@ -58,7 +58,7 @@ def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
 # @param resolution of the density image
 # @area ((cp_x,cp_y)(width,height)) corner point of the measurement field referencing to c.sys. of complete scenario
 #       and area of the measurement field
-def calc_density_timeseries(data, area, resolution, bounds, sigma):
+def calculate_density_timeseries(data, area, resolution, bounds, sigma):
     timeseries = []
     size = (int(area[2] / resolution), int(area[3] / resolution))
     density_field = get_gaussian_grid(bounds[0], bounds[1], resolution, sigma)

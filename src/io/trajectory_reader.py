@@ -23,34 +23,14 @@ def get_all_trajectory_files(root_dir):
     files = glob(root_dir + '/**/*.trajectories')
     return files
 
-
-# Read vadere trajectory files recursivly from given root directory.
-#
-# @param path: parent directory of trajectory files
-# @param nmbr_of_files: specify the number of files that are
-#                       being read, if not specified all files
-#                       are read
-def read_trajectories(path, nmbr_of_files=-1):
-
-    files = get_all_trajectory_files(path)
-    file_count = len(files)
-    scenarios = []
-    if nmbr_of_files == -1:
-        i_max = file_count - 1
-    else:
-        i_max = nmbr_of_files
-    for i in range(0, i_max):
-        print(files[i])
-        file = open(files[i], newline='\n')
-        reader = csv.reader(file, delimiter=' ')
-        scenario = []
-        for row in reader:
-            scenario.append(row)
-        scenario_without_head = scenario[1:]
-        scenarios.append(scenario_without_head)
-
-    return scenarios
-
+def read_trajectory_file(path):
+    print(path)
+    file = open(path, newline='\n')
+    file_reader = csv.reader(file, delimiter=' ')
+    scenario = []
+    for row in file_reader:
+        scenario.append(row)
+    return scenario[1:] # remove head row with labels
 
 def convert_data(data):
     def convert_row(row):
@@ -65,7 +45,11 @@ def convert_data(data):
     return list(map(convert_row, data))
 
 
-def extract_observation_area(data, x, y, width, height):
+def extract_observation_area(data, area):
+    x = area[0]
+    y = area[1]
+    width = area[2]
+    height = area[3]
     return ([row for row in data if (x <= row[INDEX_POS_X] <= (x + width)) and
              (y <= row[INDEX_POS_Y] <= (y + height))])
 
@@ -82,8 +66,6 @@ def calculate_pedestrian_target_distribution(data):
             target_id_counts[2] += 1
     return [round(x / len(data),2) for x in target_id_counts]
 
-
-
 def sort_chronological(data):
     data_sorted = sorted(data, key=lambda row:row[INDEX_TIME_STEP])
     current_time = data_sorted[0][INDEX_TIME_STEP]
@@ -99,21 +81,11 @@ def sort_chronological(data):
             current_time += 1
     return data_chron
 
-def get_data_and_target_distribution(path, area, time_step_bound):
-
-    # read trajectory files
-    data_raw = read_trajectories(path, time_step_bound)
-
-    # convert to numeric data
-    data_converted = convert_data(data_raw)
-
-    # extract observation area
-    data_observation = extract_observation_area(data_converted,
-                                                area[0], area[1], area[2], area[3])
-    # sort by time step
-    data_chronological = sort_chronological(data_observation)
-
-    # calculate target distribution
-    target_distribution = calculate_pedestrian_target_distribution(data_observation)
-
-    return data_chronological, target_distribution
+def extract_period_from_to(scenario, time_step_bounds):
+    start_time_step = time_step_bounds[0]
+    stop_time_step = time_step_bounds[1]
+    tmp = []
+    for time_step in scenario:
+        if time_step[0][INDEX_TIME_STEP] >= start_time_step and time_step[0][INDEX_TIME_STEP] <= stop_time_step:
+            tmp.append(time_step)
+    return tmp
