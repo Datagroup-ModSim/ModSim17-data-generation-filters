@@ -59,8 +59,8 @@ def pedestrian_count_main():
         # calculate pedestrian target distribution
         output_file_name = get_output_file_name(pedestrian_target_distribution, name="count_density_")
         # calculate density
-        calculate_pedestrian_density(data_period,OBSERVATION_AREA, RESOLUTION,OUTPUT_ROOT_DIRECTORY,output_file_name,i)
+        calculate_pedestrian_density(data_period,OBSERVATION_AREA, 1,OUTPUT_ROOT_DIRECTORY,output_file_name,i)
 
 
-#main()
-pedestrian_count_main()
+main()
+#pedestrian_count_main()

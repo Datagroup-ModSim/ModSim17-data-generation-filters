@@ -10,7 +10,7 @@ def write_to_csv(timeseries, path, file_name, count):
 
 
 def write_matrix_to_file(matrix, path, file_name, timestep, count):
-    destination = path + '/' + file_name + '_' + str(count) + '_dist_' + str(timestep)
+    destination = path + '/' + file_name + '_' + str(count) + str(timestep) + '.csv'
     np.savetxt(destination, matrix, delimiter=';', fmt='%1.4f')
 
 

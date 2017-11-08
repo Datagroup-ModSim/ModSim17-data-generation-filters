@@ -19,7 +19,7 @@ INDEX_TARGET_ID = 4
 # @param size of measurement_field
 def calculate_pedestrian_density(data, observation_area, resolution, output_root_directory, output_file_name, count):
     size_matrix = (int(observation_area[2] / resolution), int(observation_area[3] / resolution))
-    tmp = np.array(data)
+    tmp = np.array(data[4])
     for timestep in data:  # iterate over pedestrians
         matrix = np.zeros(size_matrix)  # new matrix for new time step
         for ped in timestep:
@@ -58,12 +58,12 @@ def add_pedestrian(ped, matrix, observation_area, resolution):
                         positions.append([x_pos_int - 1, y_pos_int - 1])  # field diagonal from ped
 
             else:  # only between two field on x-axis
-                positions.append([x_pos_int - 1, y_pos_int])
+                if x_pos_int > 0:
+                    positions.append([x_pos_int - 1, y_pos_int])
         else:  # only between two field on y-axis
-            positions.append([x_pos_int, y_pos_int - 1])
+            if y_pos_int > 0:
+                positions.append([x_pos_int, y_pos_int - 1])
 
     for pos in positions:
-        if h - pos[1] - 1 >= 100:
-            print(pos)
         matrix[h - pos[1] - 1][pos[0]] = pedVal / len(positions)
 

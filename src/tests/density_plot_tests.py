@@ -7,6 +7,8 @@ from matplotlib import pyplot as plt
 from matplotlib import cm
 
 
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../output/')  # directory were output files are
+
 # --------------------------------------------------------
 # Test for density data
 # --------------------------------------------------------
@@ -19,15 +21,15 @@ def get_file_names(directory):
         file_names.append(file)
     return file_names
 
+
 def test_density_data(file_dir, resize):
 
     file_names = get_file_names(file_dir)
 
     # plot single file
     for name in file_names:
-        data = read_density(file_dir + name)
-        plot_gauss_glocke(data)
-        #plot_density(data, file_dir, name, resize)
+        data = read_density(name)
+        plot_density(data, file_dir, name, resize)
 
 
 # read data files into matrix
@@ -87,4 +89,8 @@ def plot_density(data, file_dir, filename, resize):
     if resize:
         img = img.resize((s[0] * 10, s[1] * 10))
 
-    img.save(str(file_dir + "{0}.png").format(filename[:-4]))
+    img.save(str("{0}.png").format(filename[:-4]))
+
+
+
+test_density_data(OUTPUT_ROOT_DIRECTORY,resize=False)
