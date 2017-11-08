@@ -1,34 +1,37 @@
 import math
-
 import numpy as np
-from density_plot_tests import test_density_data
 
-from parse_trajectory_file import write_matrix_file, X_POS_INDEX, Y_POS_INDEX, \
-    read_data, convert_data, sort_data
+from src.io.density_writer import write_matrix_to_file
 
+INDEX_TIME_STEP = 0
+INDEX_PED_ID = 1
+INDEX_POS_X = 2
+INDEX_POS_Y = 3
+INDEX_TARGET_ID = 4
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Pedestrian count density
 # ----------------------------------------------------------------------------------------------------------------------
 
+
 # counts pedestrian density in units
 # @param data chronologically sorted pedestrian data by time step
 # @param size of measurement_field
-def count_ped_density(data, size_measurement_field, resolution, dir_output):
-    size_matrix = (int(size_measurement_field[0] / resolution), int(size_measurement_field[0] / resolution))
-
+def calculate_pedestrian_density(data, observation_area, resolution, output_root_directory, output_file_name, count):
+    size_matrix = (int(observation_area[2] / resolution), int(observation_area[3] / resolution))
+    tmp = np.array(data)
     for timestep in data:  # iterate over pedestrians
         matrix = np.zeros(size_matrix)  # new matrix for new time step
         for ped in timestep:
-            find_density_distribution(ped, matrix, resolution)
+            add_pedestrian(ped, matrix, observation_area, resolution)
 
-        write_matrix_file(dir_output, matrix, timestep[0][0])  # write matrix directly to file
+        write_matrix_to_file(matrix, output_root_directory, output_file_name, timestep[0][0], count)  # write matrix directly to file
 
 
 # add density of ped depending on current possition
-def find_density_distribution(ped, matrix, resolution):
-    x_pos = np.round(ped[X_POS_INDEX] / resolution, 1)  # round to 1 numb after decimal point
-    y_pos = np.round(ped[Y_POS_INDEX] / resolution, 1)
+def add_pedestrian(ped, matrix, observation_area, resolution):
+    x_pos = np.round((ped[INDEX_POS_X] - observation_area[0])/ resolution, 1)  # round to 1 numb after decimal point
+    y_pos = np.round((ped[INDEX_POS_Y] - observation_area[1])/ resolution, 1)
 
     x_pos_frac, x_pos_int = math.modf(x_pos)
     y_pos_frac, y_pos_int = math.modf(y_pos)
@@ -60,28 +63,7 @@ def find_density_distribution(ped, matrix, resolution):
             positions.append([x_pos_int, y_pos_int - 1])
 
     for pos in positions:
+        if h - pos[1] - 1 >= 100:
+            print(pos)
         matrix[h - pos[1] - 1][pos[0]] = pedVal / len(positions)
 
-
-
-# -------------------------------------------------------------------------------------------------
-
-dir_output = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\output\\"
-dir_input = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\testdata\\"
-filename_input = "postvis.trajectories"
-
-
-def main_calculation(filename, dir_input, dir_output, size_measurement_field, resolution):
-    data_raw = read_data(dir_input + filename)
-    data = convert_data(data_raw)
-
-    # sort data by time step, only take the wanted time steps
-    data_sorted = sort_data(data, framerate=10)
-
-    # calculate ...
-    count_ped_density(data_sorted, size_measurement_field, resolution, dir_output)
-
-    test_density_data(dir_output, resize=True)
-
-
-main_calculation(filename_input, dir_input, dir_output, (50, 50), 1)
