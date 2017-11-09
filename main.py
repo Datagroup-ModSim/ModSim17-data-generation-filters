@@ -14,11 +14,11 @@ from src.density.pedestrian_count_density import calculate_pedestrian_density
 
 INPUT_ROOT_DIRECTORY = os.path.join('input')    # directory to read imput files from
 OUTPUT_ROOT_DIRECTORY = os.path.join('output')  # directory to write output files to
-OBSERVATION_AREA = [20, 5, 10, 10]              # select data from observed area, [offset_x, offset_y, width, height]
+OBSERVATION_AREA = [0, 0, 50, 50]              # select data from observed area, [offset_x, offset_y, width, height]
 TIME_STEP_BOUNDS = (10, 100)                     # select data that lies between this time steps
 RESOLUTION = 0.1                                # resolution for density calculations
 SIGMA = 0.7                                     # constant for gaussian density function, see `gaussian.py`
-GAUSS_DENSITY_BOUNDS = (1, 1)                   # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
+GAUSS_DENSITY_BOUNDS = (2, 2)                   # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
 
 def process_data_file(file):
     # read single trajectory file
@@ -45,7 +45,7 @@ def main():
         density_timeseries = calculate_density_timeseries(data_period, OBSERVATION_AREA, RESOLUTION, GAUSS_DENSITY_BOUNDS, SIGMA)
         # generate file name through pedestrian target distribution
         output_file_name = get_output_file_name(pedestrian_target_distribution)
-        print(output_file_name)
+
         # write to disk
         write_to_csv(density_timeseries, OUTPUT_ROOT_DIRECTORY, output_file_name, i)
 

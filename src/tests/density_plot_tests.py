@@ -2,10 +2,16 @@ import csv
 from glob import glob
 import os
 from PIL import Image
-import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import cm
 
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d
+
+import pandas as pd
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+import numpy as np
 
 OUTPUT_ROOT_DIRECTORY = os.path.join('../../output/')  # directory were output files are
 
@@ -50,22 +56,25 @@ def read_density(file_dir):
     return data
 
 
-def plot_gauss_glocke(data):
+def plot_gauss_glocke():
+
+    data = read_density("R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\gauss.csv")
 
     data = np.array(data)
 
     x1 = data.shape[0]
-    x2 = data.shape[1]
+    #x2 = data.shape[1][:][-10]
 
-    l1 = np.linspace(0,x1,num=x1)
-    l2 = np.linspace(0,x2,num=x2)
+    l1 = np.linspace(13,66,num=53)
+    #l2 = np.linspace(0,x2,num=x2)
 
-    X, Y = np.meshgrid(l1, l2)
+    X, Y = np.meshgrid(l1, l1)
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-
-    surf = ax.plot_surface(X, Y, data, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+    print(np.shape(data[13:66,13:66]))
+    surf = ax.plot_surface(X, Y, data[33:86,13:66], cmap=cm.coolwarm,linewidth=0, antialiased=False)
+    np.savetxt("vadere_gaussian.csv",data[33:86,13:66],delimiter=";",fmt='%0.4f')
     # Add a color bar which maps values to colors.
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.title("Gaussian")
@@ -92,5 +101,4 @@ def plot_density(data, file_dir, filename, resize):
     img.save(str("{0}.png").format(filename[:-4]))
 
 
-
-test_density_data(OUTPUT_ROOT_DIRECTORY,resize=False)
+#test_density_data(OUTPUT_ROOT_DIRECTORY,resize=False)

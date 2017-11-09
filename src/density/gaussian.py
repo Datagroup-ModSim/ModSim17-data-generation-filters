@@ -1,4 +1,5 @@
 import numpy as np
+from src.tests.density_plot_tests import read_density
 
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1
@@ -6,18 +7,29 @@ INDEX_POS_X = 2
 INDEX_POS_Y = 3
 INDEX_TARGET_ID = 4
 
+
 def gaussian_pdf(ped_rad, sigma, x):
-    return (1 / 2 * np.pi * sigma) * np.exp(-(np.linalg.norm(x - ped_rad) / (2 * sigma ** 2)))
+    norm = np.linalg.norm(x - ped_rad)
+    nenner = ((0.195*2)**2)*np.sqrt(3)*0.5
+    zaehler = (2*np.pi*sigma**2)
+    factor = np.sqrt(nenner/zaehler)
+
+    return factor*(1 / 2 * np.pi * sigma) * np.exp(-norm / (2 * sigma ** 2))
 
 def get_gaussian_grid(start, stop, res, sigma):
     x1 = np.arange(-start, 0, res)
     x2 = np.arange(0, stop + res, res)
     x = np.append(x1, x2)
     xx, yy = np.meshgrid(x, x, sparse=False)
-    grid = (xx ** 2 + yy ** 2) / ((stop ** 2) * 2)
+    grid = (xx ** 2 + yy ** 2) # / ((stop ** 2) * 2)
     ped_radius = np.zeros([1,1])
     gauss = np.vectorize(gaussian_pdf)
     return gauss(ped_radius, sigma, grid)
+
+def get_vadere_gaussian_grid():
+    data = read_density("vadere_gaussian.csv")
+    return np.array(data)
+
 
     # ----------------------------------------------------------------------------------------------------------------------
     # density_field matrix with density values for ped calculated with static gausian density field
@@ -62,6 +74,7 @@ def calculate_density_timeseries(data, area, resolution, bounds, sigma):
     timeseries = []
     size = (int(area[2] / resolution), int(area[3] / resolution))
     density_field = get_gaussian_grid(bounds[0], bounds[1], resolution, sigma)
+    #density_field = get_vadere_gaussian_grid()
 
     matrix = np.zeros(size)
     index = 0
