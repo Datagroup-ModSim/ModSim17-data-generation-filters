@@ -1,5 +1,6 @@
 import numpy as np
 from src.tests.density_plot_tests import read_density
+from src.io.density_writer import write_matrix_to_file
 
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1
@@ -33,7 +34,7 @@ def get_vadere_gaussian_grid():
 
     # ----------------------------------------------------------------------------------------------------------------------
     # density_field matrix with density values for ped calculated with static gausian density field
-def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
+def add_pedestrian_density(ped, matrix, density_field, area, resolution):
     # calculate the density for one ped and add to matrix
 
     size = density_field.shape
@@ -70,8 +71,8 @@ def calculate_gaussian_density(ped, matrix, density_field, area, resolution):
 # @param resolution of the density image
 # @area ((cp_x,cp_y)(width,height)) corner point of the measurement field referencing to c.sys. of complete scenario
 #       and area of the measurement field
-def calculate_density_timeseries(data, area, resolution, bounds, sigma):
-    timeseries = []
+def calculate_density_timeseries(data, area, resolution, bounds, sigma, current_dist, file):
+
     size = (int(area[2] / resolution), int(area[3] / resolution))
     density_field = get_gaussian_grid(bounds[0], bounds[1], resolution, sigma)
     #density_field = get_vadere_gaussian_grid()
@@ -80,9 +81,8 @@ def calculate_density_timeseries(data, area, resolution, bounds, sigma):
     index = 0
     for timestep in data:
         for ped in timestep:
-            timeseries.append(calculate_gaussian_density(ped, matrix, density_field, area, resolution))
+            add_pedestrian_density(ped, matrix, density_field, area, resolution)
+
 
         matrix = np.zeros(size)  # new matrix
         index += 1
-
-    return timeseries

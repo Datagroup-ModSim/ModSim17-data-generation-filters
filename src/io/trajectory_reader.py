@@ -1,5 +1,6 @@
 import csv
 from glob import glob
+import numpy as np
 
 ################################################################################
 # run with `python main.py`                                                    #
@@ -53,18 +54,29 @@ def extract_observation_area(data, area):
     return ([row for row in data if (x <= row[INDEX_POS_X] <= (x + width)) and
              (y <= row[INDEX_POS_Y] <= (y + height))])
 
+
 # number of targets hardcoded, currently 3
 # target ids hardcoded
+# also calculate total distribution
 def calculate_pedestrian_target_distribution(data):
-    target_id_counts = [0, 0, 0]
-    for row in data:
-        if row[INDEX_TARGET_ID] == 1:
-            target_id_counts[0] += 1
-        elif row[INDEX_TARGET_ID] == 2:
-            target_id_counts[1] += 1
-        else:
-            target_id_counts[2] += 1
-    return [round(x / len(data),2) for x in target_id_counts]
+    current_dist = []
+    for timestep in data:
+        target_id_counts = [0, 0, 0]
+        for row in timestep:
+            if row[INDEX_TARGET_ID] == 1:
+                target_id_counts[0] += 1
+            elif row[INDEX_TARGET_ID] == 2:
+                target_id_counts[1] += 1
+            else:
+                target_id_counts[2] += 1
+
+        current_dist.append([round(x / len(timestep),2) for x in target_id_counts]) # TODO check if correct!
+
+    length = len(current_dist[0])
+    total_dist = [np.sum(current_dist[0]) / length, np.sum(current_dist[1]) / length, np.sum(current_dist[2]) / length]
+
+    return current_dist, total_dist
+
 
 def sort_chronological(data):
     data_sorted = sorted(data, key=lambda row:row[INDEX_TIME_STEP])

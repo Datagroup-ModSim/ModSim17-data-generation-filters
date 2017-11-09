@@ -9,9 +9,17 @@ from src.density.gaussian import get_gaussian_grid
 # ----------------------------------------------------------------------------------------------------------------------
 
 INPUT_BASE_DIR = "R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\ModSim17-data-generation-filters\\vadere_gaussdichte\\"
-#test_density_data(INPUT_BASE_DIR, resize=False)
 
-grid = get_gaussian_grid(1,1,0.05,0.7)
-print(np.shape(grid))
-plot_gauss_glocke(grid)
+
+def do_some_thing(index, file):
+    file.write(str(index)+'\n')
+    file.flush()
+
+
+with open("test_file.csv",mode='a') as f:
+    for i in range(0,10):
+        do_some_thing(i,f)
+
+    print("finished")
+
 
