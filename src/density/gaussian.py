@@ -78,11 +78,12 @@ def calculate_density_timeseries(data, area, resolution, bounds, sigma, current_
     #density_field = get_vadere_gaussian_grid()
 
     matrix = np.zeros(size)
+    print(size)
     index = 0
     for timestep in data:
         for ped in timestep:
             add_pedestrian_density(ped, matrix, density_field, area, resolution)
 
-
+        write_matrix_to_file(matrix, current_dist[index],file)
         matrix = np.zeros(size)  # new matrix
         index += 1

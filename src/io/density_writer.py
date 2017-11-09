@@ -33,7 +33,7 @@ def write_to_csv_new_version(timeseries, path, file_name, dist):
 
             file.write(row)
 
-def write_matrix_to_file(matrix, path, file_name, timestep, count):
+def write_matrix_to_file_old(matrix, path, file_name, timestep, count):
     destination = path + '/' + file_name + '_' + str(count) + str(timestep) + '.csv'
     np.savetxt(destination, matrix, delimiter=';', fmt='%1.4f')
 
