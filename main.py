@@ -55,7 +55,8 @@ def main():
         data_period, pedestrian_target_distribution, global_distribution = process_data_file(trajectory_files[i])
         # generate file name through pedestrian target distribution
         output_file_name = get_output_file_name(global_distribution)  # filename with global dist
-        with open(OUTPUT_ROOT_DIRECTORY + output_file_name + str(i) + '.csv', mode='a') as file:
+        print(output_file_name)
+        with open(OUTPUT_ROOT_DIRECTORY +'\\'+ output_file_name +"_" +str(i) + '.csv', mode='a') as file:
             # calculate gaussian density
             calculate_density_timeseries(data_period, OBSERVATION_AREA, \
                                          RESOLUTION, GAUSS_DENSITY_BOUNDS, SIGMA, \

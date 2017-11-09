@@ -20,22 +20,27 @@ OUTPUT_ROOT_DIRECTORY = os.path.join('../../output/')  # directory were output f
 # --------------------------------------------------------
 
 def get_file_names(directory):
-    os.chdir(directory)
     file_names = []
 
-    for file in glob("*.csv"):
+    for file in glob(directory+"*.csv"):
         file_names.append(file)
     return file_names
 
 
-def test_density_data(file_dir, resize):
-
-    file_names = get_file_names(file_dir)
+def test_density_data():
+    size = (500,500)
+    file_names = get_file_names(OUTPUT_ROOT_DIRECTORY)
 
     # plot single file
     for name in file_names:
         data = read_density(name)
-        plot_density(data, file_dir, name, resize)
+        tag = 1
+        for row in data:
+            print(len(row[0:-3]))
+            row = row[0:-3]
+            matrix = np.reshape(row,size)
+            plot_density(matrix, name, tag)
+            tag+=1
 
 
 # read data files into matrix
@@ -81,7 +86,7 @@ def plot_gauss_glocke():
     plt.show()
 
 
-def plot_density(data, file_dir, filename, resize):
+def plot_density(data, filename, tag):
     # plot data
     data = np.array(data)
     s = data.shape
@@ -92,13 +97,10 @@ def plot_density(data, file_dir, filename, resize):
     for i in range(0, s[0]):
         for j in range(0, s[1]):
             val = data[i][j]
-            bw = np.uint8(255-(val*255)/(max_data) )
+            bw = np.uint8(255-(val*255)/(max_data))
             img.putpixel((j, i), (bw, bw, bw))
 
-    if resize:
-        img = img.resize((s[0] * 10, s[1] * 10))
-
-    img.save(str("{0}.png").format(filename[:-4]))
+    img.save(str("{0}{1}.png").format(filename[:-4],tag))
 
 
-#test_density_data(OUTPUT_ROOT_DIRECTORY,resize=False)
+test_density_data()
