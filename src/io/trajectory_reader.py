@@ -25,7 +25,7 @@ def get_all_trajectory_files(root_dir):
     return files
 
 def read_trajectory_file(path):
-    print(path)
+    #print(path)
     file = open(path, newline='\n')
     file_reader = csv.reader(file, delimiter=' ')
     scenario = []
@@ -72,8 +72,9 @@ def calculate_pedestrian_target_distribution(data):
 
         current_dist.append([round(x / len(timestep),2) for x in target_id_counts]) # TODO check if correct!
 
-    length = len(current_dist[0])
-    total_dist = [np.sum(current_dist[0]) / length, np.sum(current_dist[1]) / length, np.sum(current_dist[2]) / length]
+    length = len(current_dist)
+    tmp = np.array(current_dist)
+    total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
 
     return current_dist, total_dist
 
@@ -95,7 +96,8 @@ def sort_chronological(data):
 
 def extract_period_from_to(scenario, time_step_bounds):
     start_time_step = time_step_bounds[0]
-    stop_time_step = time_step_bounds[1]
+    t_max = scenario[-1][INDEX_TIME_STEP]
+    stop_time_step = t_max[0] - time_step_bounds[1]
     tmp = []
     for time_step in scenario:
         if time_step[0][INDEX_TIME_STEP] >= start_time_step and time_step[0][INDEX_TIME_STEP] <= stop_time_step:

@@ -11,16 +11,21 @@ from src.io.trajectory_reader import read_trajectory_file \
     , calculate_pedestrian_target_distribution
 from src.density.gaussian import calculate_density_timeseries
 from src.density.pedestrian_count_density import calculate_pedestrian_density
+from src.io.attribute_file_generator import generate_attributes_file
+from src.tests.density_plot_tests import test_density_data
+
+# ----------------------------------------------------------------------------------------------------------------------
+VERSION = 1.0
+# ----------------------------------------------------------------------------------------------------------------------
 
 INPUT_ROOT_DIRECTORY = os.path.join('input')  # directory to read imput files from
 OUTPUT_ROOT_DIRECTORY = os.path.join('output')  # directory to write output files to
-OBSERVATION_AREA = [0, 0, 50, 50]  # select data from observed area, [offset_x, offset_y, width, height]
-TIME_STEP_BOUNDS = (10, 100)  # select data that lies between this time steps
+OBSERVATION_AREA = [20, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+TIME_STEP_BOUNDS = (40, 80)  # curt off number of timesteps from start and end time
 RESOLUTION = 0.1  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
-GAUSS_DENSITY_BOUNDS = (
-2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
-
+GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
+FRAMERATE = 10
 
 def process_data_file(file):
     # read single trajectory file
@@ -35,15 +40,14 @@ def process_data_file(file):
     data_period = extract_period_from_to(data_chronological, TIME_STEP_BOUNDS)
     data_reduced = []
     for time in data_period:
-        if time[0][0] % 10 == 0:
-            print(time[0])
+        if time[0][0] % FRAMERATE == 0:
             data_reduced.append(time)
-
     # calculate pedestrian target distribution
     pedestrian_target_distribution, global_distribution = \
         calculate_pedestrian_target_distribution(data_reduced)  # use data before it is sorted!
 
     return data_reduced, pedestrian_target_distribution, global_distribution
+
 
 
 def main():
@@ -62,6 +66,14 @@ def main():
                                          RESOLUTION, GAUSS_DENSITY_BOUNDS, SIGMA, \
                                          pedestrian_target_distribution, file)
 
+        print("done: ", str(np.round(((i+1) / number_of_files) * 100,0)), " %")
+        print(output_file_name + str(i), " = ", trajectory_files[i])
+    # Datatype, script version tag, OBSERVATION_AREA,
+    # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
+    generate_attributes_file(OUTPUT_ROOT_DIRECTORY,["gaussian density",str(VERSION),str(OBSERVATION_AREA), str(TIME_STEP_BOUNDS), \
+                              str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),str(FRAMERATE), str(trajectory_files).replace("input\\"," ")])
+
+
 def pedestrian_count_main():
     trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
     number_of_files = len(trajectory_files)
@@ -75,6 +87,6 @@ def pedestrian_count_main():
             # calculate density
             calculate_pedestrian_density(data_period, OBSERVATION_AREA, 1, OUTPUT_ROOT_DIRECTORY, output_file_name, i)
 
-
+#test_files_for_dublicates()
 main()
 # pedestrian_count_main()

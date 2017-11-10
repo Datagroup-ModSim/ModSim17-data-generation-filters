@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('../../output/')  # directory were output files are
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../output')  # directory were output files are
 
 # --------------------------------------------------------
 # Test for density data
@@ -22,25 +22,28 @@ OUTPUT_ROOT_DIRECTORY = os.path.join('../../output/')  # directory were output f
 def get_file_names(directory):
     file_names = []
 
-    for file in glob(directory+"*.csv"):
+    for file in glob(directory+"//*.csv"):
         file_names.append(file)
     return file_names
 
-
+OBSERVATION_AREA = [25, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
 def test_density_data():
-    size = (500,500)
+    size = (100,100)
     file_names = get_file_names(OUTPUT_ROOT_DIRECTORY)
 
     # plot single file
+    tag_file = 1
     for name in file_names:
         data = read_density(name)
-        tag = 1
+        tag_row = 1
+        print("done: ",str(np.round((tag_file/len(file_names))*100,0))," %")
         for row in data:
-            print(len(row[0:-3]))
             row = row[0:-3]
             matrix = np.reshape(row,size)
-            plot_density(matrix, name, tag)
-            tag+=1
+            plot_density(matrix, name, str("_{0}_{1}").format(tag_file,tag_row))
+            tag_row+=1
+
+        tag_file+=1
 
 
 # read data files into matrix
