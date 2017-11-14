@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from src.io.density_writer import write_to_csv, get_output_file_name
+from src.io.density_writer import get_output_file_name
 from src.io.trajectory_reader import read_trajectory_file \
     , get_all_trajectory_files \
     , convert_data \
@@ -21,7 +21,7 @@ VERSION = 1.0
 INPUT_ROOT_DIRECTORY = os.path.join('input')  # directory to read imput files from
 OUTPUT_ROOT_DIRECTORY = os.path.join('output')  # directory to write output files to
 OBSERVATION_AREA = [20, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
-TIME_STEP_BOUNDS = (40, 80)  # curt off number of timesteps from start and end time
+TIME_STEP_BOUNDS = (10, 10)  # curt off number of timesteps from start and end time
 RESOLUTION = 0.1  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
@@ -42,12 +42,12 @@ def process_data_file(file):
     for time in data_period:
         if time[0][0] % FRAMERATE == 0:
             data_reduced.append(time)
+
     # calculate pedestrian target distribution
     pedestrian_target_distribution, global_distribution = \
         calculate_pedestrian_target_distribution(data_reduced)  # use data before it is sorted!
 
     return data_reduced, pedestrian_target_distribution, global_distribution
-
 
 
 def main():
@@ -74,6 +74,21 @@ def main():
                               str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),str(FRAMERATE), str(trajectory_files).replace("input\\"," ")])
 
 
+
+def print_dist():
+    trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
+    number_of_files = len(trajectory_files)
+
+    for i in range(0, number_of_files):  # process each file successively
+
+        data_period, pedestrian_target_distribution, global_distribution = process_data_file(trajectory_files[i])
+        # generate file name through pedestrian target distribution
+        output_file_name = get_output_file_name(global_distribution)  # filename with global dist
+        print(trajectory_files[i], " = ", global_distribution)
+        print("max pedestrian count: ", data_period[-1][-1][1])
+
+
+
 def pedestrian_count_main():
     trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
     number_of_files = len(trajectory_files)
@@ -87,6 +102,7 @@ def pedestrian_count_main():
             # calculate density
             calculate_pedestrian_density(data_period, OBSERVATION_AREA, 1, OUTPUT_ROOT_DIRECTORY, output_file_name, i)
 
-#test_files_for_dublicates()
+
+#print_dist()
 main()
 # pedestrian_count_main()

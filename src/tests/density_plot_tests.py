@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('../../output')  # directory were output files are
+OUTPUT_ROOT_DIRECTORY = os.path.join('R:\\IC7\\ModelierungsSeminar\\Dichtedaten\\generated\\run_11112017_1832\\')  # directory were output files are
 
 # --------------------------------------------------------
 # Test for density data

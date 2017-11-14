@@ -63,9 +63,9 @@ def calculate_pedestrian_target_distribution(data):
     for timestep in data:
         target_id_counts = [0, 0, 0]
         for row in timestep:
-            if row[INDEX_TARGET_ID] == 1:
+            if row[INDEX_TARGET_ID] == 4:
                 target_id_counts[0] += 1
-            elif row[INDEX_TARGET_ID] == 2:
+            elif row[INDEX_TARGET_ID] == 5:
                 target_id_counts[1] += 1
             else:
                 target_id_counts[2] += 1
@@ -74,6 +74,7 @@ def calculate_pedestrian_target_distribution(data):
 
     length = len(current_dist)
     tmp = np.array(current_dist)
+    print(length)
     total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
 
     return current_dist, total_dist
