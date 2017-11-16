@@ -74,7 +74,7 @@ def calculate_pedestrian_target_distribution(data):
 
     length = len(current_dist)
     tmp = np.array(current_dist)
-    print(length)
+    #print(length)
     total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
 
     return current_dist, total_dist

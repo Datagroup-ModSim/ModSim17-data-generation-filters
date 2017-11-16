@@ -104,6 +104,3 @@ def plot_density(data, filename, tag):
             img.putpixel((j, i), (bw, bw, bw))
 
     img.save(str("{0}{1}.png").format(filename[:-4],tag))
-
-
-test_density_data()

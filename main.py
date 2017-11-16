@@ -20,8 +20,9 @@ VERSION = 1.0
 
 INPUT_ROOT_DIRECTORY = os.path.join('input')  # directory to read imput files from
 OUTPUT_ROOT_DIRECTORY = os.path.join('output')  # directory to write output files to
+SCENARIO_SIZE = [50,60]
 OBSERVATION_AREA = [20, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
-TIME_STEP_BOUNDS = (10, 10)  # curt off number of timesteps from start and end time
+TIME_STEP_BOUNDS = (0, 0)  # curt off number of timesteps from start and end time
 RESOLUTION = 0.1  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
@@ -70,7 +71,7 @@ def main():
         print(output_file_name + str(i), " = ", trajectory_files[i])
     # Datatype, script version tag, OBSERVATION_AREA,
     # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
-    generate_attributes_file(OUTPUT_ROOT_DIRECTORY,["gaussian density",str(VERSION),str(OBSERVATION_AREA), str(TIME_STEP_BOUNDS), \
+    generate_attributes_file(OUTPUT_ROOT_DIRECTORY,["gaussian density",str(VERSION),str(SCENARIO_SIZE),str(OBSERVATION_AREA), str(TIME_STEP_BOUNDS), \
                               str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),str(FRAMERATE), str(trajectory_files).replace("input\\"," ")])
 
 
@@ -103,6 +104,6 @@ def pedestrian_count_main():
             calculate_pedestrian_density(data_period, OBSERVATION_AREA, 1, OUTPUT_ROOT_DIRECTORY, output_file_name, i)
 
 
-#print_dist()
-main()
+print_dist()
+#main()
 # pedestrian_count_main()
