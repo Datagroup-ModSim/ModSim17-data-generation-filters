@@ -21,12 +21,12 @@ VERSION = 1.0
 INPUT_ROOT_DIRECTORY = os.path.join('input')  # directory to read imput files from
 OUTPUT_ROOT_DIRECTORY = os.path.join('output')  # directory to write output files to
 SCENARIO_SIZE = [50,60]
-OBSERVATION_AREA = [20, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
-TIME_STEP_BOUNDS = (0, 0)  # curt off number of timesteps from start and end time
-RESOLUTION = 0.1  # resolution for density calculations
+OBSERVATION_AREA = [20, 10, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+TIME_STEP_BOUNDS = (30, 45)  # curt off number of timesteps from start and end time
+RESOLUTION = 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
-FRAMERATE = 10
+FRAMERATE = 2
 
 def process_data_file(file):
     # read single trajectory file
@@ -75,7 +75,6 @@ def main():
                               str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),str(FRAMERATE), str(trajectory_files).replace("input\\"," ")])
 
 
-
 def print_dist():
     trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
     number_of_files = len(trajectory_files)
@@ -85,9 +84,8 @@ def print_dist():
         data_period, pedestrian_target_distribution, global_distribution = process_data_file(trajectory_files[i])
         # generate file name through pedestrian target distribution
         output_file_name = get_output_file_name(global_distribution)  # filename with global dist
-        print(trajectory_files[i], " = ", global_distribution)
+        print(trajectory_files[i], " = ", global_distribution, " = ", output_file_name)
         print("max pedestrian count: ", data_period[-1][-1][1])
-
 
 
 def pedestrian_count_main():
@@ -104,6 +102,6 @@ def pedestrian_count_main():
             calculate_pedestrian_density(data_period, OBSERVATION_AREA, 1, OUTPUT_ROOT_DIRECTORY, output_file_name, i)
 
 
-print_dist()
-#main()
+#print_dist()
+main()
 # pedestrian_count_main()

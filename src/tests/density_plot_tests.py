@@ -3,9 +3,7 @@ from glob import glob
 import os
 from PIL import Image
 from matplotlib import pyplot as plt
-from matplotlib import cm
 
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 
 import pandas as pd
@@ -13,7 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('R:\\IC7\\ModelierungsSeminar\\Dichtedaten\\generated\\run_11112017_1832\\')  # directory were output files are
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../output')  # directory were output files are
 
 # --------------------------------------------------------
 # Test for density data
@@ -26,9 +24,9 @@ def get_file_names(directory):
         file_names.append(file)
     return file_names
 
-OBSERVATION_AREA = [25, 5, 10, 10] #[25, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+OBSERVATION_AREA = [20, 20, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
 def test_density_data():
-    size = (100,100)
+    size = (20,20)
     file_names = get_file_names(OUTPUT_ROOT_DIRECTORY)
 
     # plot single file
@@ -36,7 +34,6 @@ def test_density_data():
     for name in file_names:
         data = read_density(name)
         tag_row = 1
-        print("done: ",str(np.round((tag_file/len(file_names))*100,0))," %")
         for row in data:
             row = row[0:-3]
             matrix = np.reshape(row,size)
@@ -44,6 +41,7 @@ def test_density_data():
             tag_row+=1
 
         tag_file+=1
+        print("done: ", str(np.round((tag_file / len(file_names)) * 100, 0)), " %")
 
 
 # read data files into matrix
@@ -66,7 +64,7 @@ def read_density(file_dir):
 
 def plot_gauss_glocke():
 
-    data = read_density("R:\\IC7\\ModelierungsSeminar\\data-generation-filters\\gauss.csv")
+    data = read_density(os.path.join("")) # file liegt nicht auf repo
 
     data = np.array(data)
 
@@ -94,13 +92,15 @@ def plot_density(data, filename, tag):
     data = np.array(data)
     s = data.shape
     img = Image.new('RGB', s)
-
     max_data = np.max(data)
 
-    for i in range(0, s[0]):
-        for j in range(0, s[1]):
-            val = data[i][j]
+    for y in range(0, s[0]):
+        for x in range(0, s[1]):
+            val = data[y][x]
             bw = np.uint8(255-(val*255)/(max_data))
-            img.putpixel((j, i), (bw, bw, bw))
+            img.putpixel((y, x), (bw, bw, bw))
 
     img.save(str("{0}{1}.png").format(filename[:-4],tag))
+
+
+test_density_data()

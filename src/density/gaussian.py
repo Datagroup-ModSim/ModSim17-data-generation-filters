@@ -73,7 +73,7 @@ def add_pedestrian_density(ped, matrix, density_field, area, resolution):
 #       and area of the measurement field
 def calculate_density_timeseries(data, area, resolution, bounds, sigma, current_dist, file):
 
-    size = (int(area[2] / resolution), int(area[3] / resolution))
+    size = (int(area[3] / resolution), int(area[2] / resolution))
     density_field = get_gaussian_grid(bounds[0], bounds[1], resolution, sigma)
     #density_field = get_vadere_gaussian_grid()
 
@@ -84,6 +84,6 @@ def calculate_density_timeseries(data, area, resolution, bounds, sigma, current_
         for ped in timestep:
             add_pedestrian_density(ped, matrix, density_field, area, resolution)
 
-        write_matrix_to_file(matrix, current_dist[index],file)
+        write_matrix_to_file(np.round(matrix,4), current_dist[index],file)
         matrix = np.zeros(size)  # new matrix
         index += 1

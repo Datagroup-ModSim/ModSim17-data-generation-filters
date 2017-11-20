@@ -24,6 +24,6 @@ def write_to_csv(timeseries, path, file_name, dist):
             file.write(row)
 
 
-def get_output_file_name(dist, name='density_'):
-    return name + str(int(dist[0]*100)) + '_' + str(int(dist[1]*100)) + '_' + str(int(dist[2]*100))
+def get_output_file_name(dist, name='_density'):
+    return str(int(dist[0]*100)) + '-' + str(int(dist[1]*100)) + '-' + str(int(dist[2]*100)) + name
 
