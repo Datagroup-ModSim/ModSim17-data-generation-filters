@@ -12,7 +12,11 @@ from matplotlib import cm
 import numpy as np
 
 OUTPUT_ROOT_DIRECTORY = os.path.join('../../output')  # directory were output files are
-
+INDEX_TIME_STEP = 0
+INDEX_PED_ID = 1
+INDEX_POS_X = 2
+INDEX_POS_Y = 3
+INDEX_TARGET_ID = 4
 # --------------------------------------------------------
 # Test for density data
 # --------------------------------------------------------
@@ -24,7 +28,9 @@ def get_file_names(directory):
         file_names.append(file)
     return file_names
 
-OBSERVATION_AREA = [20, 20, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+OBSERVATION_AREA1 = [20, 10, 10, 10]
+OBSERVATION_AREA2 = [20, 15, 10, 10]
+OBSERVATION_AREA3 = [20, 20, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
 def test_density_data():
     size = (20,20)
     file_names = get_file_names(OUTPUT_ROOT_DIRECTORY)
@@ -101,6 +107,31 @@ def plot_density(data, filename, tag):
             img.putpixel((y, x), (bw, bw, bw))
 
     img.save(str("{0}{1}.png").format(filename[:-4],tag))
+
+
+
+def plot_trajectories(data):
+    data_sorted = sorted(data, key=lambda row: row[INDEX_PED_ID])
+    id = 1
+    sorted_by_id = []
+    current_ped = []
+    for row in data_sorted:
+
+        if id == row[INDEX_PED_ID]:
+            current_ped.append(row)
+        else:
+            sorted_by_id.append(current_ped)
+            current_ped = []
+            current_ped.append(row)
+            id = id + 1
+
+    print("Number of Pedestrians = ", len(sorted_by_id))
+    for id in sorted_by_id:
+        x = np.array(id)
+        plt.plot(x[:,INDEX_POS_X],x[:,INDEX_POS_Y])
+
+    plt.show()
+    return sorted_by_id
 
 
 test_density_data()

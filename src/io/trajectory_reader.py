@@ -33,6 +33,8 @@ def read_trajectory_file(path):
         scenario.append(row)
     return scenario[1:] # remove head row with labels
 
+
+# converts the read data from strings to numeric data
 def convert_data(data):
     def convert_row(row):
         # cast each col element
@@ -46,6 +48,7 @@ def convert_data(data):
     return list(map(convert_row, data))
 
 
+# extracts the observation area of the camera from the data
 def extract_observation_area(data, area):
     x = area[0]
     y = area[1]
@@ -72,43 +75,76 @@ def calculate_pedestrian_target_distribution(data):
 
         current_dist.append([round(x / len(timestep),2) for x in target_id_counts]) # TODO check if correct!
 
-    current_dist = list(map(map_to_100_percent,current_dist))
+    #current_dist = list(map(map_to_100_percent,current_dist))
 
     length = len(current_dist)
     tmp = np.array(current_dist)
     total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
 
-    total_dist = map_to_100_percent(total_dist)
+    #total_dist = map_to_100_percent(total_dist)
 
-    if not np.sum(total_dist) == 1.0:
+    if not np.sum(total_dist) == 1.0: # TODO check mapping
         print(total_dist)
         #raise ValueError("Distribution dose not add up to 100%!")
 
     return current_dist, total_dist
 
-
+# Helper method for mapping non 100% distributions to the correct scale
 def map_to_100_percent(dist):
     dist = np.round(dist,2)
     factor = 1 / np.sum(dist)
     dist = np.round([dist[0] * factor, dist[1] * factor, dist[2] * factor],2)
     return dist
 
-
+# sorts the data chronologicaly by timestep
+# new format: [[list of all data for timestep 1], [list of all data for timestep 2], [...], ... ]
 def sort_chronological(data):
+    print("length: ",len(data))
     data_sorted = sorted(data, key=lambda row:row[INDEX_TIME_STEP])
     current_time = data_sorted[0][INDEX_TIME_STEP]
     data_chron = []
     rows_equal_time = []
+    chron_len = 0
     for row in data_sorted:
         if row[INDEX_TIME_STEP] == current_time:
             rows_equal_time.append(row)
         else:
             data_chron.append(rows_equal_time)
+            chron_len = chron_len + len(rows_equal_time)
             rows_equal_time = []
             rows_equal_time.append(row)
             current_time += 1
+
     return data_chron
 
+# reduces data
+# takes only every "framerate" timestep
+def extract_framerate(data, framerate):
+    data_reduced = []
+    for time in data:
+        if time[0][0] % framerate == 0:
+            data_reduced.append(time)
+
+    return data_reduced
+
+
+# record only if a given percent of pedestrians are already inside the observation area for the camera
+# @param data trajectory data sorted by timestep
+# @param percent percentage of how full the observation area should at least be before starting to record
+def extract_recording_period(data, percent):
+    tmp = [len(timestep) for timestep in data]
+    max_length_timestep = np.max(tmp)
+    length_boundary = int((max_length_timestep*percent)/100)
+    recording = []
+    for timestep in data:
+        if len(timestep) >= length_boundary:
+            recording.append(timestep)
+
+    return recording
+
+
+# currently not in use anymore
+# cuts out the given time period
 def extract_period_from_to(scenario, time_step_bounds):
     start_time_step = time_step_bounds[0]
     #t_max = scenario[-1][INDEX_TIME_STEP]

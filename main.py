@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 from src.io.density_writer import get_output_file_name
 from src.io.trajectory_reader import read_trajectory_file \
@@ -7,12 +8,13 @@ from src.io.trajectory_reader import read_trajectory_file \
     , convert_data \
     , extract_observation_area \
     , sort_chronological \
-    , extract_period_from_to \
+    , extract_framerate \
+    , extract_recording_period \
     , calculate_pedestrian_target_distribution
 from src.density.gaussian import calculate_density_timeseries
 from src.density.pedestrian_count_density import calculate_pedestrian_density
 from src.io.attribute_file_generator import generate_attributes_file
-from src.tests.density_plot_tests import test_density_data
+from src.tests.density_plot_tests import plot_trajectories
 
 # ----------------------------------------------------------------------------------------------------------------------
 VERSION = 1.0
@@ -21,12 +23,17 @@ VERSION = 1.0
 INPUT_ROOT_DIRECTORY = os.path.join('input')  # directory to read imput files from
 OUTPUT_ROOT_DIRECTORY = os.path.join('output')  # directory to write output files to
 SCENARIO_SIZE = [50,60]
-OBSERVATION_AREA = [20, 10, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
-TIME_STEP_BOUNDS = (30, 45)  # curt off number of timesteps from start and end time
+OBSERVATION_AREA0 = [0, 0, 50, 60]
+OBSERVATION_AREA = [20, 10, 10, 10]
+OBSERVATION_AREA2 = [20, 15, 10, 10]
+OBSERVATION_AREA3 = [20, 20, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+TIME_STEP_BOUNDS = (10, 40)  # curt off number of timesteps from start and end time
 RESOLUTION = 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
-FRAMERATE = 2
+FRAMERATE = 1
+RECORDING_DENSITY_PERCENT = 70
+
 
 def process_data_file(file):
     # read single trajectory file
@@ -34,21 +41,18 @@ def process_data_file(file):
     #  convert to numeric data
     data_numeric = convert_data(data_raw)
     # extract data from a specified observation area
+    # record only if 80% of pedestrians are inside of observation area
     data_observation = extract_observation_area(data_numeric, OBSERVATION_AREA)
     # sort time steps chronological
     data_chronological = sort_chronological(data_observation)
-    # extract observation period
-    data_period = extract_period_from_to(data_chronological, TIME_STEP_BOUNDS)
-    data_reduced = []
-    for time in data_period:
-        if time[0][0] % FRAMERATE == 0:
-            data_reduced.append(time)
-
+    # reduce data by framerate
+    data_framerate = extract_framerate(data_chronological, FRAMERATE)
+    data_recording_period = extract_recording_period(data_framerate,RECORDING_DENSITY_PERCENT)
     # calculate pedestrian target distribution
     pedestrian_target_distribution, global_distribution = \
-        calculate_pedestrian_target_distribution(data_reduced)  # use data before it is sorted!
+        calculate_pedestrian_target_distribution(data_recording_period)  # use data before it is sorted!
 
-    return data_reduced, pedestrian_target_distribution, global_distribution
+    return data_recording_period, pedestrian_target_distribution, global_distribution
 
 
 def main():
@@ -73,6 +77,7 @@ def main():
     # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
     generate_attributes_file(OUTPUT_ROOT_DIRECTORY,["gaussian density",str(VERSION),str(SCENARIO_SIZE),str(OBSERVATION_AREA), str(TIME_STEP_BOUNDS), \
                               str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),str(FRAMERATE), str(trajectory_files).replace("input\\"," ")])
+
 
 
 def print_dist():
