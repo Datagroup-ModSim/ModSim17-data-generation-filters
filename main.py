@@ -15,7 +15,7 @@ from src.density.gaussian import calculate_density_timeseries
 from src.density.pedestrian_count_density import calculate_pedestrian_density
 from src.io.attribute_file_generator import generate_attributes_file
 from src.tests.density_plot_tests import plot_trajectories
-
+from src.trajectories.trajectories_formatter import format_trajectories
 # ----------------------------------------------------------------------------------------------------------------------
 VERSION = 1.0
 # ----------------------------------------------------------------------------------------------------------------------
@@ -27,12 +27,11 @@ OBSERVATION_AREA0 = [0, 0, 50, 60]
 OBSERVATION_AREA = [20, 10, 10, 10]
 OBSERVATION_AREA2 = [20, 15, 10, 10]
 OBSERVATION_AREA3 = [20, 20, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
-TIME_STEP_BOUNDS = (10, 40)  # curt off number of timesteps from start and end time
 RESOLUTION = 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
-FRAMERATE = 1
-RECORDING_DENSITY_PERCENT = 70
+FRAMERATE = 2
+RECORDING_DENSITY_PERCENT = 80
 
 
 def process_data_file(file):
@@ -47,12 +46,12 @@ def process_data_file(file):
     data_chronological = sort_chronological(data_observation)
     # reduce data by framerate
     data_framerate = extract_framerate(data_chronological, FRAMERATE)
-    data_recording_period = extract_recording_period(data_framerate,RECORDING_DENSITY_PERCENT)
+    data_recording_period, time_step_bounds = extract_recording_period(data_framerate,RECORDING_DENSITY_PERCENT)
     # calculate pedestrian target distribution
     pedestrian_target_distribution, global_distribution = \
         calculate_pedestrian_target_distribution(data_recording_period)  # use data before it is sorted!
 
-    return data_recording_period, pedestrian_target_distribution, global_distribution
+    return data_recording_period, pedestrian_target_distribution, global_distribution, time_step_bounds
 
 
 def main():
@@ -61,7 +60,7 @@ def main():
 
     for i in range(0, number_of_files):  # process each file successively
 
-        data_period, pedestrian_target_distribution, global_distribution = process_data_file(trajectory_files[i])
+        data_period, pedestrian_target_distribution, global_distribution, time_step_bounds = process_data_file(trajectory_files[i])
         # generate file name through pedestrian target distribution
         output_file_name = get_output_file_name(global_distribution)  # filename with global dist
         print(output_file_name)
@@ -75,9 +74,11 @@ def main():
         print(output_file_name + str(i), " = ", trajectory_files[i])
     # Datatype, script version tag, OBSERVATION_AREA,
     # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
-    generate_attributes_file(OUTPUT_ROOT_DIRECTORY,["gaussian density",str(VERSION),str(SCENARIO_SIZE),str(OBSERVATION_AREA), str(TIME_STEP_BOUNDS), \
-                              str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),str(FRAMERATE), str(trajectory_files).replace("input\\"," ")])
-
+    attributes = ["gaussian density",str(VERSION),str(SCENARIO_SIZE),\
+                  str(OBSERVATION_AREA), str(time_step_bounds), \
+                  str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),\
+                  str(FRAMERATE), str(trajectory_files).replace("input\\"," ")]
+    generate_attributes_file(OUTPUT_ROOT_DIRECTORY,attributes)
 
 
 def print_dist():
@@ -86,27 +87,33 @@ def print_dist():
 
     for i in range(0, number_of_files):  # process each file successively
 
-        data_period, pedestrian_target_distribution, global_distribution = process_data_file(trajectory_files[i])
+        data, pedestrian_target_distribution, global_distribution, time_step_bounds = process_data_file(trajectory_files[i])
         # generate file name through pedestrian target distribution
         output_file_name = get_output_file_name(global_distribution)  # filename with global dist
         print(trajectory_files[i], " = ", global_distribution, " = ", output_file_name)
-        print("max pedestrian count: ", data_period[-1][-1][1])
 
+        attributes = ["gaussian density", str(VERSION), str(SCENARIO_SIZE), \
+                      str(OBSERVATION_AREA), str(time_step_bounds), \
+                      str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS), \
+                      str(FRAMERATE), str(trajectory_files).replace("input\\", " ")]
+        generate_attributes_file(OUTPUT_ROOT_DIRECTORY, attributes)
 
-def pedestrian_count_main():
+def trajectories_data():
     trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
     number_of_files = len(trajectory_files)
-    file_name = ""
-    for i in range(0, number_of_files):
 
-        with open(OUTPUT_ROOT_DIRECTORY + file_name, mode='a') as file:
-            data_period, pedestrian_target_distribution = process_data_file(trajectory_files[i])
-            # calculate pedestrian target distribution
-            output_file_name = get_output_file_name(pedestrian_target_distribution, name="count_density_")
-            # calculate density
-            calculate_pedestrian_density(data_period, OBSERVATION_AREA, 1, OUTPUT_ROOT_DIRECTORY, output_file_name, i)
+    for i in range(0, number_of_files):  # process each file successively
 
+        data, pedestrian_target_distribution, global_distribution, time_step_bounds = process_data_file(trajectory_files[i])
+        # generate file name through pedestrian target distribution
+
+        with open(OUTPUT_ROOT_DIRECTORY + '\\' + "_trajectories_" + str(i) + '.csv', mode='a') as file:
+            # process trajectories data
+            format_trajectories(data, file)
+
+        # Datatype, script version tag, OBSERVATION_AREA,
+        # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
 
 #print_dist()
 main()
-# pedestrian_count_main()
+#trajectories_data()

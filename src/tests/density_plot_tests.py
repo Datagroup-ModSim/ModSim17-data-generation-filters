@@ -11,7 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('../../output')  # directory were output files are
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../output/run3_800/run3_800_pos3')  # directory were output files are
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1
 INDEX_POS_X = 2
@@ -33,6 +33,7 @@ OBSERVATION_AREA2 = [20, 15, 10, 10]
 OBSERVATION_AREA3 = [20, 20, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
 def test_density_data():
     size = (20,20)
+    #size = (120,100)
     file_names = get_file_names(OUTPUT_ROOT_DIRECTORY)
 
     # plot single file
@@ -106,6 +107,7 @@ def plot_density(data, filename, tag):
             bw = np.uint8(255-(val*255)/(max_data))
             img.putpixel((y, x), (bw, bw, bw))
 
+    img = img.resize((200,200))
     img.save(str("{0}{1}.png").format(filename[:-4],tag))
 
 

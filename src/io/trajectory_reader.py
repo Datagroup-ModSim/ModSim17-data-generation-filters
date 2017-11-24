@@ -99,7 +99,7 @@ def map_to_100_percent(dist):
 # sorts the data chronologicaly by timestep
 # new format: [[list of all data for timestep 1], [list of all data for timestep 2], [...], ... ]
 def sort_chronological(data):
-    print("length: ",len(data))
+    #print("length: ",len(data))
     data_sorted = sorted(data, key=lambda row:row[INDEX_TIME_STEP])
     current_time = data_sorted[0][INDEX_TIME_STEP]
     data_chron = []
@@ -140,7 +140,8 @@ def extract_recording_period(data, percent):
         if len(timestep) >= length_boundary:
             recording.append(timestep)
 
-    return recording
+    time_step_bounds = [recording[0][0][INDEX_TIME_STEP],recording[-1][0][INDEX_TIME_STEP]]
+    return recording, time_step_bounds
 
 
 # currently not in use anymore
