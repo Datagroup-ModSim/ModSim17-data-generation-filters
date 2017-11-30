@@ -5,7 +5,7 @@
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "D:\\Uni\\Modellbildungsseminar\\ModSim17-data-generation-filters\\vadere scenarios\\output\\Scenario 3_2017-11-30_16-26-17.133\\postvis.trajectories",
+      "filename" : "D:\\Uni\\Modellbildungsseminar\\ModSim17-data-generation-filters\\vadere scenarios\\output\\Scenario 3_2017-11-30_16-44-19.235\\postvis.trajectories",
       "processors" : [ 1, 2, 3 ]
     } ],
     "processors" : [ {
@@ -16,7 +16,12 @@
       "id" : 2
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityProcessor",
-      "id" : 3
+      "id" : 3,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 1,
+        "backSteps" : 3
+      }
     } ],
     "isTimestamped" : true
   },
@@ -233,8 +238,8 @@
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 30.0,
-        "spawnAtRandomPositions" : false,
-        "useFreeSpaceOnly" : false,
+        "spawnAtRandomPositions" : true,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -252,8 +257,8 @@
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 30.0,
-        "spawnAtRandomPositions" : false,
-        "useFreeSpaceOnly" : false,
+        "spawnAtRandomPositions" : true,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -271,8 +276,8 @@
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 30.0,
-        "spawnAtRandomPositions" : false,
-        "useFreeSpaceOnly" : false,
+        "spawnAtRandomPositions" : true,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
