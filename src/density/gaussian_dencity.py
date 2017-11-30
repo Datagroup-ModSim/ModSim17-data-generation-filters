@@ -1,6 +1,7 @@
 import numpy as np
-from src.tests.density_plot_tests import read_density
+
 from src.io.density_writer import write_matrix_to_file
+from test.density_plot_tests import read_density
 
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1

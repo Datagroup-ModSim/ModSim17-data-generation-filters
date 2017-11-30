@@ -1,14 +1,7 @@
 import csv
-from glob import glob
 
-INDEX_TIME_STEP = 0
-INDEX_PEDESTRIAN_ID = 1
-INDEX_POSITION_X = 2
-INDEX_POSITION_Y = 3
-INDEX_TARGET_ID = 4
-INDEX_VELOCITY_ABSOULTE = 5
-INDEX_VELOCITY_X = 6
-INDEX_VELOCITY_Y = 7
+from glob import glob
+from src.velocity.calculator import calculate_velocity_vectors
 
 def get_input_file_names(path, file_names):
     """
@@ -53,15 +46,15 @@ def read_trajectories(trajectories_file_name):
 
 def read_velocity(velocity_file_name):
     """
-    Read one "output_ts_pid.txt" file, which holds pedestrian velocity values.
-    Convert velocity to numeric values.
+    Read one "output_ts_pid.txt" file, which holds pedestrian input values.
+    Convert input to numeric values.
 
     :param velocity_file_name: Relative path to a output_ts_pid.txt file
     :type velocity_file_name: str
     :return: List of velocities
     """
     result = []
-    #field_names = ['velocity']
+    #field_names = ['input']
     file= open(velocity_file_name, newline='\n')
     csv.register_dialect('velocity', delimiter=';')
     velocity_file = csv.DictReader(file, dialect='velocity')
@@ -92,8 +85,17 @@ def merge_trajectories_and_velocities(trajectories, velocities):
         return None
 
 def get_data(path, file_names):
+    """
+    Execute all neccessary operations to get input data (trajectories and velocities).
+
+    :param path: Relative path to input file directory.
+    :type path: str
+    :param file_names:  File names to search for, globbing is enabled
+    :return: Trajectory and input data
+    """
     input_file_names = get_input_file_names(path, file_names)
     data_trajectories = read_trajectories(input_file_names[0])
     data_velocity = read_velocity(input_file_names[1])
     data = merge_trajectories_and_velocities(data_trajectories, data_velocity)
+    data = calculate_velocity_vectors(data)
     return data
