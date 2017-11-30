@@ -3,6 +3,7 @@ import os
 from src.io.density_writer import get_output_file_name
 from src.io.trajectory_reader import get_data
 from src.density.gaussian_density import calculate_density_timeseries
+from src.filter.filtering import filter_data
 
 VERSION = 1.0
 
@@ -30,6 +31,7 @@ def main():
                                                       RESOLUTION,\
                                                       GAUSS_DENSITY_BOUNDS,\
                                                       SIGMA)
+    data_filtered = filter_data(density_timeseries)
 
     #todo filter anwendung
     #todo files schreiben
