@@ -3,6 +3,7 @@ import csv
 from glob import glob
 from src.velocity.calculator import calculate_velocity_vectors
 
+
 def get_input_file_names(path, file_names):
     """
     Search for all input files in a given directory.

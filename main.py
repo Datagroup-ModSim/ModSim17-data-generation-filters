@@ -2,7 +2,7 @@ import os
 
 from src.io.density_writer import get_output_file_name
 from src.io.trajectory_reader import get_data
-from src.util.helper import group_by_pedestrian_id
+from src.density.gaussian_density import calculate_density_timeseries
 
 VERSION = 1.0
 
@@ -16,7 +16,7 @@ OBSERVATION_AREA = [20, 10, 10, 10]
 OBSERVATION_AREA2 = [20, 15, 10, 10]
 OBSERVATION_AREA3 = [20, 20, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
 RESOLUTION = 0.5  # resolution for density calculations
-SIGMA = 0.7  # constant for gaussian density function, see `gaussian_dencity.py`
+SIGMA = 0.7  # constant for gaussian density function, see `gaussian_density.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
 FRAMERATE = 2
 RECORDING_DENSITY_PERCENT = 80
@@ -25,6 +25,14 @@ RECORDING_DENSITY_PERCENT = 80
 
 def main():
     data = get_data(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
+    density_timeseries = calculate_density_timeseries(data,\
+                                                      OBSERVATION_AREA0,\
+                                                      RESOLUTION,\
+                                                      GAUSS_DENSITY_BOUNDS,\
+                                                      SIGMA)
+
+    #todo filter anwendung
+    #todo files schreiben
 
 
     # trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)

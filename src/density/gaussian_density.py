@@ -1,7 +1,8 @@
 import numpy as np
 
 from src.io.density_writer import write_matrix_to_file
-from test.density_plot_tests import read_density
+#from test.density_plot_tests import read_density
+from src.util.helper import group_by_time_step
 
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1
@@ -72,12 +73,14 @@ def add_pedestrian_density(ped, matrix, density_field, area, resolution):
 # @param resolution of the density image
 # @area ((cp_x,cp_y)(width,height)) corner point of the measurement field referencing to c.sys. of complete scenario
 #       and area of the measurement field
-def calculate_density_timeseries(data, area, resolution, bounds, sigma, current_dist, file):
+def calculate_density_timeseries(data, area, resolution, bounds, sigma):
+    data = group_by_time_step(data)
 
     size = (int(area[3] / resolution), int(area[2] / resolution))
     density_field = get_gaussian_grid(bounds[0], bounds[1], resolution, sigma)
     #density_field = get_vadere_gaussian_grid()
 
+    result = []
     matrix = np.zeros(size)
     #print(size)
     index = 0
@@ -85,6 +88,8 @@ def calculate_density_timeseries(data, area, resolution, bounds, sigma, current_
         for ped in timestep:
             add_pedestrian_density(ped, matrix, density_field, area, resolution)
 
-        write_matrix_to_file(np.round(matrix,4), current_dist[index],file)
+        #write_matrix_to_file(np.round(matrix,4), current_dist[index],file)
+        result.append(matrix)
         matrix = np.zeros(size)  # new matrix
         index += 1
+    return result
