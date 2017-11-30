@@ -3,6 +3,7 @@ import os
 from src.io.density_writer import get_output_file_name
 from src.io.trajectory_reader import get_data
 from src.util.helper import group_by_pedestrian_id
+from src.filter.filtering import thresholding
 
 VERSION = 1.0
 
@@ -24,7 +25,8 @@ RECORDING_DENSITY_PERCENT = 80
 
 
 def main():
-    data = get_data(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
+    thresholding()
+    #data = get_data(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
 
 
     # trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
