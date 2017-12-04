@@ -56,8 +56,9 @@ def group_by(data, key, start, stop):
     result = []
     current = start
     while current <= stop:
-        group =  list(filter(lambda row:row[key] == current, data))
-        result.append(group)
+        group = list(filter(lambda row:row[key] == current, data))
+        if not not group: # empty list is falsy
+            result.append(group)
         current = current + 1
         group = []
     return result
@@ -188,72 +189,42 @@ def extract_observation_area(data, area):
 # reduces data
 # takes only every "framerate" timestep
 def extract_framerate(data, framerate):
+    data = group_by_time_step(data)
     data_reduced = []
     for time in data:
         if time[0][0] % framerate == 0:
             data_reduced.append(time)
-
     return data_reduced
 
-# # sorts the data chronologicaly by timestep
-# # new format: [[list of all data for timestep 1], [list of all data for timestep 2], [...], ... ]
-# def sort_chronological(data):
-#     #print("length: ",len(data))
-#     data_sorted = sorted(data, key=lambda row:row[INDEX_TIME_STEP])
-#     current_time = data_sorted[0][INDEX_TIME_STEP]
-#     data_chron = []
-#     rows_equal_time = []
-#     chron_len = 0
-#     for row in data_sorted:
-#         if row[INDEX_TIME_STEP] == current_time:
-#             rows_equal_time.append(row)
-#         else:
-#             data_chron.append(rows_equal_time)
-#             chron_len = chron_len + len(rows_equal_time)
-#             rows_equal_time = []
-#             rows_equal_time.append(row)
-#             current_time += 1
-#
-#     return data_chron
-
-# Helper method for mapping non 100% distributions to the correct scale
-def map_to_100_percent(dist):
-    dist = np.round(dist,2)
-    factor = 1 / np.sum(dist)
-    dist = np.round([dist[0] * factor, dist[1] * factor, dist[2] * factor],2)
-    return dist
-
-
-
-
-# number of targets hardcoded, currently 3
-# target ids hardcoded
-# also calculate total distribution
-def calculate_pedestrian_target_distribution(data):
-    current_dist = []
+def extract_recording_period(data, percent):
+    tmp = [len(timestep) for timestep in data]
+    max_length_timestep = max(tmp)
+    length_boundary = int((max_length_timestep*percent)/100)
+    recording = []
     for timestep in data:
-        target_id_counts = [0, 0, 0]
-        for row in timestep:
-            if row[INDEX_TARGET_ID] == 4: # TODO read target id tags from file
-                target_id_counts[0] += 1
-            elif row[INDEX_TARGET_ID] == 5:
-                target_id_counts[1] += 1
-            else:
-                target_id_counts[2] += 1
+        if len(timestep) >= length_boundary:
+            recording.append(timestep)
 
-        current_dist.append([round(x / len(timestep),2) for x in target_id_counts]) # TODO check if correct!
+    return recording
 
-    #current_dist = list(map(map_to_100_percent,current_dist))
+def calculate_momentary_target_distributions(data):
+    #time_steps = group_by_time_step(data)
+    result = []
+    for time_step in data:
+        row = calculate_total_target_distribution(time_step)
+        result.append(row)
+    return result
 
-    length = len(current_dist)
-    tmp = np.array(current_dist)
-    total_dist = [np.sum(tmp[:,0]) / length, np.sum(tmp[:,1]) / length, np.sum(tmp[:,2]) / length]
 
-    #total_dist = map_to_100_percent(total_dist)
-
-    if not np.sum(total_dist) == 1.0: # TODO check mapping
-        print(total_dist)
-        #raise ValueError("Distribution dose not add up to 100%!")
-
-    return current_dist, total_dist
-
+def calculate_total_target_distribution(data):
+    total_distribution = [0, 0, 0]
+    length = len(data)
+    for row in data:
+        if row[INDEX_TARGET_ID] == 1:
+            total_distribution[0] = total_distribution[0] + 1
+        elif row[INDEX_TARGET_ID] == 2:
+            total_distribution[1] = total_distribution[1] + 1
+        else:
+            total_distribution[2] = total_distribution[2] + 1
+    total_distribution[:] = [round(count / length, 2) * 100 for count in total_distribution]
+    return total_distribution

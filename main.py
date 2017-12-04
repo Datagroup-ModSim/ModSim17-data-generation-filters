@@ -1,9 +1,13 @@
 import os
 
-from src.io.density_writer import get_output_file_name
-from src.io.trajectory_reader import get_data
+from src.io.file_reader import FileReader
+from src.io.file_writer import create_output_directory, write_density_timeseries
 from src.density.gaussian_density import calculate_density_timeseries
+<<<<<<< Updated upstream
 from src.filter.filtering import filter_data
+=======
+from src.util.helper import calculate_total_target_distribution, calculate_momentary_target_distributions
+>>>>>>> Stashed changes
 
 VERSION = 1.0
 
@@ -22,8 +26,11 @@ GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian dens
 FRAMERATE = 2
 RECORDING_DENSITY_PERCENT = 80
 
+def run_density_calculations():
 
+    trajectory_reader = FileReader(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
 
+<<<<<<< Updated upstream
 def main():
     data = get_data(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
     density_timeseries = calculate_density_timeseries(data,\
@@ -32,85 +39,24 @@ def main():
                                                       GAUSS_DENSITY_BOUNDS,\
                                                       SIGMA)
     data_filtered = filter_data(density_timeseries)
+=======
+    while not trajectory_reader.is_finished:
+>>>>>>> Stashed changes
 
-    #todo filter anwendung
-    #todo files schreiben
+        data, current_input_directory = trajectory_reader.get_next_data(OBSERVATION_AREA0,
+                                                                        FRAMERATE, RECORDING_DENSITY_PERCENT)
+
+        current_output_directory = create_output_directory(current_input_directory, OUTPUT_DIRECTORY)
+
+        density_timeseries = calculate_density_timeseries(data, OBSERVATION_AREA0, RESOLUTION,
+                                                          GAUSS_DENSITY_BOUNDS, SIGMA)
+
+        total_target_distribution = calculate_total_target_distribution(data)
+
+        momentary_target_distributions = calculate_momentary_target_distributions(data)
+
+        write_density_timeseries(density_timeseries, current_output_directory, total_target_distribution,
+                                 momentary_target_distributions)
 
 
-    # trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
-    # number_of_files = len(trajectory_files)
-    #
-    # for i in range(0, number_of_files):  # process each file successively
-    #
-    #     data_period, pedestrian_target_distribution, global_distribution, time_step_bounds = process_data_file(trajectory_files[i])
-    #     # generate file name through pedestrian target distribution
-    #     output_file_name = get_output_file_name(global_distribution)  # filename with global dist
-    #     print(output_file_name)
-    #     with open(OUTPUT_ROOT_DIRECTORY +'\\'+ output_file_name +"_" +str(i) + '.csv', mode='a') as file:
-    #         # calculate gaussian density
-    #         calculate_density_timeseries(data_period, OBSERVATION_AREA, \
-    #                                      RESOLUTION, GAUSS_DENSITY_BOUNDS, SIGMA, \
-    #                                      pedestrian_target_distribution, file)
-    #
-    #     print("done: ", str(np.round(((i+1) / number_of_files) * 100,0)), " %")
-    #     print(output_file_name + str(i), " = ", trajectory_files[i])
-    # # Datatype, script version tag, OBSERVATION_AREA,
-    # # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
-    # attributes = ["gaussian density",str(VERSION),str(SCENARIO_SIZE),\
-    #               str(OBSERVATION_AREA), str(time_step_bounds), \
-    #               str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS),\
-    #               str(FRAMERATE), str(trajectory_files).replace("input\\"," ")]
-    # generate_attributes_file(OUTPUT_ROOT_DIRECTORY,attributes)
-main()
-
-def print_dist():
-    trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
-    number_of_files = len(trajectory_files)
-
-    for i in range(0, number_of_files):  # process each file successively
-
-        data, pedestrian_target_distribution, global_distribution, time_step_bounds = process_data_file(trajectory_files[i])
-        # generate file name through pedestrian target distribution
-        output_file_name = get_output_file_name(global_distribution)  # filename with global dist
-        print(trajectory_files[i], " = ", global_distribution, " = ", output_file_name)
-
-        attributes = ["gaussian density", str(VERSION), str(SCENARIO_SIZE), \
-                      str(OBSERVATION_AREA), str(time_step_bounds), \
-                      str(RESOLUTION), str(SIGMA), str(GAUSS_DENSITY_BOUNDS), \
-                      str(FRAMERATE), str(trajectory_files).replace("input\\", " ")]
-        generate_attributes_file(OUTPUT_ROOT_DIRECTORY, attributes)
-
-def trajectories_data():
-    trajectory_files = get_all_trajectory_files(INPUT_ROOT_DIRECTORY)
-    number_of_files = len(trajectory_files)
-
-    for i in range(0, number_of_files):  # process each file successively
-
-        data, pedestrian_target_distribution, global_distribution, time_step_bounds = process_data_file(trajectory_files[i])
-        # generate file name through pedestrian target distribution
-
-        with open(OUTPUT_ROOT_DIRECTORY + '\\' + "_trajectories_" + str(i) + '.csv', mode='a') as file:
-            # process trajectories data
-            format_trajectories(data, file)
-
-        # Datatype, script version tag, OBSERVATION_AREA,
-        # TIME_STEP_BOUNDS, RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, scenarios used
-
-    def process_data_file(file):
-        # read single trajectory file
-        data_raw = read_trajectory_file(file)
-        #  convert to numeric data
-        data_numeric = convert_data(data_raw)
-        # extract data from a specified observation area
-        # record only if 80% of pedestrians are inside of observation area
-        data_observation = extract_observation_area(data_numeric, OBSERVATION_AREA)
-        # sort time steps chronological
-        data_chronological = sort_chronological(data_observation)
-        # reduce data by framerate
-        data_framerate = extract_framerate(data_chronological, FRAMERATE)
-        data_recording_period, time_step_bounds = extract_recording_period(data_framerate, RECORDING_DENSITY_PERCENT)
-        # calculate pedestrian target distribution
-        pedestrian_target_distribution, global_distribution = \
-            calculate_pedestrian_target_distribution(data_recording_period)  # use data before it is sorted!
-
-        return data_recording_period, pedestrian_target_distribution, global_distribution, time_step_bounds
+run_density_calculations()
