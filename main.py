@@ -5,6 +5,7 @@ from src.io.file_writer import create_output_directory, write_density_timeseries
 from src.density.gaussian_density import calculate_density_timeseries
 from src.filter.filtering import filter_data
 from src.util.helper import calculate_total_target_distribution, calculate_momentary_target_distributions
+from src.filter.pca import mainPCA
 
 VERSION = 1.0
 
@@ -33,7 +34,11 @@ def run_density_calculations():
 
         density_timeseries = calculate_density_timeseries(data, OBSERVATION_AREA, RESOLUTION,
                                                           GAUSS_DENSITY_BOUNDS, SIGMA)
+
         #density_timeserie_filtered = filter_data(density_timeseries)
+
+        density_timeseries = mainPCA(density_timeseries)
+
         total_target_distribution = calculate_total_target_distribution(data)
 
         momentary_target_distributions = calculate_momentary_target_distributions(data)
