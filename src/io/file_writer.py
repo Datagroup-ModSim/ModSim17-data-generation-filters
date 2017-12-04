@@ -13,10 +13,9 @@ def create_output_directory(input_directory, output_directory):
     return output_directory
 
 
-def write_density_timeseries(timeseries, path, total_distribution, momentary_distribution):
-    csv_folder = '/csv/'
+def write_density_timeseries(timeseries, path, total_distribution, momentary_distribution, unique_id):
     file_name = get_output_file_name(total_distribution)
-    path = path + csv_folder + file_name
+    path = path + '/' + file_name + str(unique_id) + '.csv'
     print('FileWriter: write to ' + path)
     file = open(path, mode='a')
     i_max = len(timeseries)
@@ -27,6 +26,8 @@ def write_density_timeseries(timeseries, path, total_distribution, momentary_dis
         row_string = ';'.join(map(str, row)) + '\n'
         file.write(row_string)
     file.close()
+    unique_id = unique_id + 1
+    return unique_id
 
 
 def get_output_file_name(distribution, name='_density'):
