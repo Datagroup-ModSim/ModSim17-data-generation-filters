@@ -33,7 +33,7 @@ def run_density_calculations():
 
         density_timeseries = calculate_density_timeseries(data, OBSERVATION_AREA, RESOLUTION,
                                                           GAUSS_DENSITY_BOUNDS, SIGMA)
-
+        #density_timeserie_filtered = filter_data(density_timeseries)
         total_target_distribution = calculate_total_target_distribution(data)
 
         momentary_target_distributions = calculate_momentary_target_distributions(data)

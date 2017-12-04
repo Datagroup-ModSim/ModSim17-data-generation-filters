@@ -7,11 +7,10 @@ import numpy as np
 
 def filter_data(density_timeseries):
     normalizeDensities(density_timeseries)
-    for matrix in density_timeseries:
-        matrix = matrix/maxVal
-    density_timeseries = thresholding(density_timeseries, 0.5)
 
-    return density_timeseries
+    density_timeseries_filtered = thresholding(density_timeseries, 0.5)
+
+    return density_timeseries_filtered
 
 def thresholding(density_timeseries, threshold):
     for matrix in density_timeseries:
@@ -26,6 +25,7 @@ def thresholding(density_timeseries, threshold):
 
 
 def normalizeDensities(density_timeseries):
+    #find max value of all timesteps
     maxValuesList = []
     for matrix in density_timeseries:
         maxValuesList.append(matrix.max())
@@ -33,5 +33,5 @@ def normalizeDensities(density_timeseries):
 
     for matrix in density_timeseries:
         matrix = matrix/maxVal
-    
+
 
