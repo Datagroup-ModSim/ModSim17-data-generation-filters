@@ -8,8 +8,6 @@ def create_output_directory(input_directory, output_directory):
     if not os.path.exists(output_directory):
         print('FileWriter: create ' + output_directory)
         os.makedirs(output_directory)
-        os.makedirs(output_directory + '/csv')
-        os.makedirs(output_directory + '/img')
     return output_directory
 
 

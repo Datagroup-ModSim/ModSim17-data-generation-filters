@@ -13,9 +13,7 @@ OUTPUT_DIRECTORY = os.path.join('output')  # directory to write output files to
 INPUT_FILE_GLOB_PATTERN = ['**/*.trajectories', '**/output_ts_pid.txt']
 SCENARIO_SIZE = [50,60]
 OBSERVATION_AREA = [0, 0, 50, 60]
-OBSERVATION_AREA1 = [20, 10, 10, 10]
-OBSERVATION_AREA2 = [20, 15, 10, 10]
-OBSERVATION_AREA3 = [20, 20, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+#[, [20, 10, 10, 10], [20, 15, 10, 10], [20, 20, 10, 10]]  # select data from observed area, [offset_x, offset_y, width, height]
 RESOLUTION = 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian_density.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
@@ -40,8 +38,9 @@ def run_density_calculations():
 
         momentary_target_distributions = calculate_momentary_target_distributions(data)
 
-        unique_id = write_density_timeseries(density_timeseries, current_output_directory, total_target_distribution,
-                                 momentary_target_distributions, unique_id)
+        unique_id = write_density_timeseries(density_timeseries, current_output_directory,
+                                             total_target_distribution, momentary_target_distributions,
+                                             unique_id)
 
 
 run_density_calculations()

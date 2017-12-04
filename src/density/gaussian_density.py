@@ -66,7 +66,7 @@ def add_pedestrian_density(ped, matrix, density_field, area, resolution):
 # @area ((cp_x,cp_y)(width,height)) corner point of the measurement field referencing to c.sys. of complete scenario
 #       and area of the measurement field
 def calculate_density_timeseries(data, area, resolution, bounds, sigma):
-
+    data = group_by_time_step(data)
     size = (int(area[3] / resolution), int(area[2] / resolution))
     density_field = get_gaussian_grid(bounds[0], bounds[1], resolution, sigma)
     #density_field = get_vadere_gaussian_grid()

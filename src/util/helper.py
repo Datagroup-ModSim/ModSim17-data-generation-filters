@@ -208,9 +208,9 @@ def extract_recording_period(data, percent):
     return recording
 
 def calculate_momentary_target_distributions(data):
-    #time_steps = group_by_time_step(data)
+    time_steps = group_by_time_step(data)
     result = []
-    for time_step in data:
+    for time_step in time_steps:
         row = calculate_total_target_distribution(time_step)
         result.append(row)
     return result

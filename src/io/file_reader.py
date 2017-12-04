@@ -34,6 +34,8 @@ class FileReader:
         data = extract_framerate(data, frame_rate)
         # select snapshots filled with pedestrians
         data = extract_recording_period(data, recording_percentage)
+        # flatten data
+        data = [row for time_steps in data for row in time_steps]
 
         folders = file_names[0].split('/')[:-1]
         current_folder = '/'.join(folders)
