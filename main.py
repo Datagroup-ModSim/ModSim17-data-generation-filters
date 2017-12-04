@@ -3,11 +3,8 @@ import os
 from src.io.file_reader import FileReader
 from src.io.file_writer import create_output_directory, write_density_timeseries
 from src.density.gaussian_density import calculate_density_timeseries
-<<<<<<< Updated upstream
 from src.filter.filtering import filter_data
-=======
 from src.util.helper import calculate_total_target_distribution, calculate_momentary_target_distributions
->>>>>>> Stashed changes
 
 VERSION = 1.0
 
@@ -29,19 +26,7 @@ RECORDING_DENSITY_PERCENT = 80
 def run_density_calculations():
 
     trajectory_reader = FileReader(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
-
-<<<<<<< Updated upstream
-def main():
-    data = get_data(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
-    density_timeseries = calculate_density_timeseries(data,\
-                                                      OBSERVATION_AREA0,\
-                                                      RESOLUTION,\
-                                                      GAUSS_DENSITY_BOUNDS,\
-                                                      SIGMA)
-    data_filtered = filter_data(density_timeseries)
-=======
     while not trajectory_reader.is_finished:
->>>>>>> Stashed changes
 
         data, current_input_directory = trajectory_reader.get_next_data(OBSERVATION_AREA0,
                                                                         FRAMERATE, RECORDING_DENSITY_PERCENT)
