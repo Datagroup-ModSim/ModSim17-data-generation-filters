@@ -8,7 +8,7 @@ Created on Sat Dec  2 16:31:27 2017
 import numpy as np
 import numpy.linalg as lin
 
-from src.filter.density_plot_tests import plot_density
+#from src.filter.density_plot_tests import plot_density
 
 def mainPCA(density_timeseries):
 

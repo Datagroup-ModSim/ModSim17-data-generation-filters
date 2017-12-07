@@ -19,7 +19,7 @@ class FileReader:
             print('FileReader: All inputs are read.')
             self.is_finished = True
 
-    def get_next_data(self, observation_area, frame_rate, recording_percentage):
+    def get_next_data(self, observation_area, frame_rate, recording_percentage, calculate_velocity):
         file_names = self.input_file_names[self.index]
         # read from all neccessary input files
         data_trajectories = read_trajectories(file_names[0])
@@ -27,7 +27,8 @@ class FileReader:
         # merge trajectories and absolute velocities
         data = merge_trajectories_and_velocities(data_trajectories, data_velocity)
         # calculate vectorial velocities
-        data = calculate_velocity_vectors(data)
+        if calculate_velocity:
+            data = calculate_velocity_vectors(data)
         # select camera observation area
         data = extract_observation_area(data, observation_area)
         # select not every snapshot to enhance performance

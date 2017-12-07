@@ -219,6 +219,8 @@ def calculate_momentary_target_distributions(data):
 def calculate_total_target_distribution(data):
     total_distribution = [0, 0, 0]
     length = len(data)
+    #target_ids = [row[INDEX_TARGET_ID] for row in data]
+    #target_ids = set(target_ids)
     for row in data:
         if row[INDEX_TARGET_ID] == 1:
             total_distribution[0] = total_distribution[0] + 1
