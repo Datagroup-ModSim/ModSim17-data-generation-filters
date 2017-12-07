@@ -1,7 +1,6 @@
 # filter methods for density Data list
 # thresholding
-#
-#
+
 
 import numpy as np
 
@@ -20,9 +19,6 @@ def thresholding(density_timeseries, threshold):
             else:
                 x = 0
     return density_timeseries
-
-
-
 
 def normalizeDensities(density_timeseries):
     #find max value of all timesteps
