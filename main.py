@@ -24,7 +24,7 @@ RESOLUTION = 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian_density.py`
 GAUSS_DENSITY_BOUNDS = (2, 2)
 FRAMERATE = 2
-RECORDING_DENSITY_PERCENT = 0
+RECORDING_DENSITY_PERCENT = 80
 CALCULATE_VELOCITY = False
 
 
@@ -77,7 +77,7 @@ def run_trajectories_formatter(observation_area):
 # Main
 # ----------------------------------------------------------------------------------------------------------------------
 
-observation_areas = [OBSERVATION_AREA1,OBSERVATION_AREA2,OBSERVATION_AREA3]
+observation_areas = [OBSERVATION_AREA0]
 
 folders = os.listdir(INPUT_DIRECTORY)
 print(folders)

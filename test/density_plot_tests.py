@@ -28,14 +28,12 @@ def get_file_names(directory):
         file_names.append(file)
     return file_names
 
-size = (10,16)
+#size = (10,16)
 #size = (20,20)
-#size = (120,100)
+size = (120,100)
 #size = (120,100)
 #size = (160,80)
-OBSERVATION_AREA1 = [20, 10, 10, 10]
-OBSERVATION_AREA2 = [20, 15, 10, 10]
-OBSERVATION_AREA3 = [20, 20, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
+
 def test_density_data():
 
     file_names = get_file_names(OUTPUT_ROOT_DIRECTORY)
@@ -111,7 +109,7 @@ def plot_density(data, filename, tag):
             bw = np.uint8(255-(val*255)/(max_data))
             img.putpixel((y, x), (bw, bw, bw))
 
-    img = img.resize((100,160))
+    #img = img.resize((100,160))
     img.save(str("{0}{1}.png").format(filename[:-4],tag))
 
 

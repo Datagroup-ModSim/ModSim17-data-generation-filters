@@ -223,8 +223,10 @@ def calculate_total_target_distribution(data):
     length = len(data)
     target_ids = list(np.array(data)[:, -1])
     target_ids = list(set(target_ids))
-    if (len(target_ids) > 3):
-        raise ValueError("To many targets")
+    number_of_targets = len(target_ids)
+
+    if number_of_targets > 4:
+        raise ValueError
 
     for row in data:
         if row[INDEX_TARGET_ID] == target_ids[0]:
@@ -232,6 +234,15 @@ def calculate_total_target_distribution(data):
         elif row[INDEX_TARGET_ID] == target_ids[1]:
             total_distribution[1] = total_distribution[1] + 1
         else:
-            total_distribution[2] = total_distribution[2] + 1
+            if number_of_targets == 3:
+                total_distribution[2] = total_distribution[2] + 1
+            else:
+                if row[INDEX_TARGET_ID] == target_ids[2]:
+                    total_distribution[2] == total_distribution[2] + 1
+                else:
+                    total_distribution[3] == total_distribution[3] + 1
+
+
+
     total_distribution[:] = [round(count / length, 2) * 100 for count in total_distribution]
     return total_distribution
