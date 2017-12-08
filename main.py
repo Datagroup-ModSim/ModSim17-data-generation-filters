@@ -2,8 +2,9 @@ from src.io.file_reader import FileReader
 from src.io.file_writer import create_output_directory, write_density_timeseries, write_trajectories_formatted, \
     generate_attributes_file_density, generate_attributes_file_trajectories
 from src.density.gaussian_density import calculate_density_timeseries
+
 from src.trajectories.trajectories_formatter import format_trajectories
-from src.filter.filtering import filter_data
+
 from src.util.helper import calculate_total_target_distribution, calculate_momentary_target_distributions
 from src.filter.pca import mainPCA
 import os
@@ -18,9 +19,10 @@ OBSERVATION_AREA = [0, 0, 50, 60]
 #[, [20, 10, 10, 10], [20, 15, 10, 10], [20, 20, 10, 10]]  # select data from observed area, [offset_x, offset_y, width, height]
 RESOLUTION = 0.5  # resolution for density calculations
 SIGMA = 0.7  # constant for gaussian density function, see `gaussian_density.py`
-GAUSS_DENSITY_BOUNDS = (2, 2)  # side length of quadratic area for gaussian density TODO: 1 val instead of tuple, hence symmetric
+GAUSS_DENSITY_BOUNDS = (2, 2)
 FRAMERATE = 2
 RECORDING_DENSITY_PERCENT = 0
+CALCULATE_VELOCITY = False
 
 
 def run_density_calculations():
@@ -28,7 +30,9 @@ def run_density_calculations():
     trajectory_reader = FileReader(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
     while not trajectory_reader.is_finished:
         data, current_input_directory = trajectory_reader.get_next_data(OBSERVATION_AREA,
-                                                                        FRAMERATE, RECORDING_DENSITY_PERCENT)
+                                                                        FRAMERATE,
+                                                                        RECORDING_DENSITY_PERCENT,
+                                                                        CALCULATE_VELOCITY)
 
         current_output_directory = create_output_directory(current_input_directory, OUTPUT_DIRECTORY)
 

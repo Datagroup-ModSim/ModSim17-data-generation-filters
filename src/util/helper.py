@@ -1,3 +1,5 @@
+import numpy as np
+
 INDEX_TIME_STEP = 0
 INDEX_PEDESTRIAN_ID = 1
 INDEX_POSITION_X = 2
@@ -219,10 +221,13 @@ def calculate_momentary_target_distributions(data):
 def calculate_total_target_distribution(data):
     total_distribution = [0, 0, 0]
     length = len(data)
+    target_ids = list(np.array(data)[:, -1])
+    target_ids = list(set(target_ids))
+    
     for row in data:
-        if row[INDEX_TARGET_ID] == 1:
+        if row[INDEX_TARGET_ID] == target_ids[0]:
             total_distribution[0] = total_distribution[0] + 1
-        elif row[INDEX_TARGET_ID] == 2:
+        elif row[INDEX_TARGET_ID] == target_ids[1]:
             total_distribution[1] = total_distribution[1] + 1
         else:
             total_distribution[2] = total_distribution[2] + 1
