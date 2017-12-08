@@ -22,12 +22,13 @@ class FileReader:
     def get_next_data(self, observation_area, frame_rate, recording_percentage):
         file_names = self.input_file_names[self.index]
         # read from all neccessary input files
-        data_trajectories = read_trajectories(file_names[0])
-        data_velocity = read_velocity(file_names[1])
+        data_trajectories = read_trajectories(file_names)
+        #data_velocity = read_velocity(file_names[1])
         # merge trajectories and absolute velocities
-        data = merge_trajectories_and_velocities(data_trajectories, data_velocity)
+        #data = merge_trajectories_and_velocities(data_trajectories, data_velocity)
         # calculate vectorial velocities
-        data = calculate_velocity_vectors(data)
+        data = data_trajectories
+        #data = calculate_velocity_vectors(data)
         # select camera observation area
         data = extract_observation_area(data, observation_area)
         # select not every snapshot to enhance performance
@@ -58,8 +59,8 @@ def get_input_file_names(path, glob_pattern):
     :return: List of relative path to input file locations :type [str]
     """
     trajectories_files = glob(path + '/' + glob_pattern[0], recursive=True)
-    velocity_files = glob(path + '/' + glob_pattern[1], recursive=True)
-    return list(zip(trajectories_files, velocity_files))
+    #velocity_files = glob(path + '/' + glob_pattern[1], recursive=True)
+    return trajectories_files#list(zip(trajectories_files, velocity_files))
 
 
 def read_trajectories(trajectories_file_name):

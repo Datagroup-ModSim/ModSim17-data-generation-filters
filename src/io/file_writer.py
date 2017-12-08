@@ -28,26 +28,61 @@ def write_density_timeseries(timeseries, path, total_distribution, momentary_dis
     return unique_id
 
 
+def write_trajectories_formatted(trajectory_formatted, current_output_directory, unique_id):
+    file_name = "trajectories_"
+    path = current_output_directory +'/' +file_name + str(unique_id+1) + ".csv"
+
+    with open(path, mode='a') as file:
+        for row in trajectory_formatted:
+            row_string = ';'.join(map(str, row)) + '\n'
+            file.writelines(row_string)
+            file.flush()
+
+    unique_id+=1
+
+    return unique_id
+
+
 def get_output_file_name(distribution, name='_density'):
     return str(int(distribution[0])) + '-' + str(int(distribution[1])) + '-' + str(int(distribution[2])) + name
 
 
+# TODO Test
 header = "# This file contains all information regarding the generated output data"
-section_header = ["# Datatype", "# script version tag","SCENARIO SIZE","# OBSERVATION AREA",
-                  "# TIME STEP_BOUNDS", "# RESOLUTION ", "# SIGMA", "# GAUSS_DENSITY BOUNDS","# FRAMERATE" ,"# scenarios used"]
+sections_density = ["# RESOLUTION ", "# SIGMA", "# GAUSS_DENSITY BOUNDS","# FRAMERATE"]
+end_section = "# data files used"
 
+def generate_attributes_file_density(files_used,observation_area, output_path, scenario_size, density_constants):
 
-def generate_attributes_file(out_dir, section_fields):
-    with open(out_dir+"\\"+"attributes.txt", mode='w', newline='\n') as file:
+    with open(output_path+"\\"+"attributes.txt", mode='w', newline='\n') as file:
         file.writelines(header)
         file.writelines('\n')
-        file.writelines('\n')
-        for i in range(0, len(section_fields)):
-            file.writelines(section_header[i])
-            file.writelines('\n')
-            file.writelines(section_fields[i])
-            file.writelines('\n')
-            file.writelines('\n')
+        file.writelines("# datatype" + '\n' + "trajectories")
+        file.writelines("# version number" + '\n' + "1.0")
+        file.writelines("# sencario size" + '\n' + scenario_size)
+        file.writelines("# observation area" + '\n' + str(observation_area))
 
+        for n in range(0, len(sections_density)):
+            file.writelines(sections_density[n])
+            file.writelines(str(density_constants[n]))
+
+        file.writelines(end_section)
+        file.writelines(files_used)
         file.flush()
+
+
+def generate_attributes_file_trajectories(files_used, observation_area, output_path, scenario_size):
+
+    with open(output_path+"\\"+"attributes.txt", mode='w', newline='\n') as file:
+        file.writelines(header)
+        file.writelines('\n')
+        file.writelines("# datatype" + '\n' + "trajectories")
+        file.writelines("# version number" + '\n' + "1.0")
+        file.writelines("# sencario size" + '\n' + scenario_size)
+        file.writelines("# observation area" + '\n' + str(observation_area))
+
+        file.writelines(end_section)
+        file.writelines(files_used)
+        file.flush()
+
 

@@ -11,7 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import numpy as np
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('../output/100')  # directory were output files are
+OUTPUT_ROOT_DIRECTORY = os.path.join('../output/100_pos1')  # directory were output files are
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1
 INDEX_POS_X = 2
@@ -28,12 +28,16 @@ def get_file_names(directory):
         file_names.append(file)
     return file_names
 
+size = (10,16)
+#size = (20,20)
+#size = (120,100)
+#size = (120,100)
+#size = (160,80)
 OBSERVATION_AREA1 = [20, 10, 10, 10]
 OBSERVATION_AREA2 = [20, 15, 10, 10]
 OBSERVATION_AREA3 = [20, 20, 10, 10] #[20, 5, 10, 10]  # select data from observed area, [offset_x, offset_y, width, height]
 def test_density_data():
-    #size = (20,20)
-    size = (120,100)
+
     file_names = get_file_names(OUTPUT_ROOT_DIRECTORY)
 
     # plot single file
@@ -107,33 +111,24 @@ def plot_density(data, filename, tag):
             bw = np.uint8(255-(val*255)/(max_data))
             img.putpixel((y, x), (bw, bw, bw))
 
-    img = img.resize((200,200))
+    img = img.resize((100,160))
     img.save(str("{0}{1}.png").format(filename[:-4],tag))
 
 
-
 def plot_trajectories(data):
-    data_sorted = sorted(data, key=lambda row: row[INDEX_PED_ID])
-    id = 1
-    sorted_by_id = []
-    current_ped = []
-    for row in data_sorted:
 
-        if id == row[INDEX_PED_ID]:
-            current_ped.append(row)
-        else:
-            sorted_by_id.append(current_ped)
-            current_ped = []
-            current_ped.append(row)
-            id = id + 1
-
-    print("Number of Pedestrians = ", len(sorted_by_id))
-    for id in sorted_by_id:
+    for id in data:
         x = np.array(id)
-        plt.plot(x[:,INDEX_POS_X],x[:,INDEX_POS_Y])
+        xx = x[:,INDEX_POS_X]
+        xy = x[:,INDEX_POS_Y]
+        plt.plot(xx,xy,'-o')
+        index = 1
+        for step in x:
+            plt.text(step[INDEX_POS_X], step[INDEX_POS_Y], str(index), color="blue", fontsize=12)
+            index+=1
 
+    plt.savefig("test norm trajectories")
     plt.show()
-    return sorted_by_id
 
 
 test_density_data()
