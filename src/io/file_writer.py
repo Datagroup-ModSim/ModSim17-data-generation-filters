@@ -11,9 +11,10 @@ def create_output_directory(input_directory, output_directory):
     return output_directory
 
 
-def write_density_timeseries(timeseries, path, total_distribution, momentary_distribution, unique_id):
+def write_density_timeseries(timeseries, sub_output_folder, total_distribution, momentary_distribution, unique_id):
     file_name = get_output_file_name(total_distribution)
-    path = path + '/' + file_name + str(unique_id) + '.csv'
+    file_name = file_name + str(unique_id) + '.csv'
+    path = os.path.join(sub_output_folder, file_name )
     print('FileWriter: write to ' + path)
     file = open(path, mode='a')
     i_max = len(timeseries)
@@ -47,7 +48,7 @@ def get_output_file_name(distribution, name='_density'):
     return str(int(distribution[0])) + '-' + str(int(distribution[1])) + '-' + str(int(distribution[2])) + name
 
 
-# TODO Test
+
 header = "# This file contains all information regarding the generated output data"
 sections_density = ["# RESOLUTION ", "# SIGMA", "# GAUSS_DENSITY BOUNDS","# FRAMERATE"]
 end_section = "# data files used"
@@ -57,14 +58,14 @@ def generate_attributes_file_density(files_used,observation_area, output_path, s
     with open(output_path+"\\"+"attributes.txt", mode='w', newline='\n') as file:
         file.writelines(header)
         file.writelines('\n')
-        file.writelines("# datatype" + '\n' + "trajectories")
-        file.writelines("# version number" + '\n' + "1.0")
-        file.writelines("# sencario size" + '\n' + scenario_size)
-        file.writelines("# observation area" + '\n' + str(observation_area))
+        file.writelines("# datatype" + '\n' + "trajectories" + '\n')
+        file.writelines("# version number" + '\n' + "1.0" + '\n')
+        file.writelines("# sencario size" + '\n' + str(scenario_size) + '\n')
+        file.writelines("# observation area" + '\n' + str(observation_area) + '\n')
 
         for n in range(0, len(sections_density)):
-            file.writelines(sections_density[n])
-            file.writelines(str(density_constants[n]))
+            file.writelines(sections_density[n] + '\n')
+            file.writelines(str(density_constants[n]) + '\n')
 
         file.writelines(end_section)
         file.writelines(files_used)
@@ -82,6 +83,7 @@ def generate_attributes_file_trajectories(files_used, observation_area, output_p
         file.writelines("# observation area" + '\n' + str(observation_area))
 
         file.writelines(end_section)
+        file.writelines('\n')
         file.writelines(files_used)
         file.flush()
 

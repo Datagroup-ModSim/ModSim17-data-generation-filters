@@ -79,7 +79,9 @@ def calculate_density_timeseries(data, area, resolution, bounds, sigma):
             add_pedestrian_density(ped, matrix, density_field, area, resolution)
 
         #write_matrix_to_file(np.round(matrix,4), current_dist[index],file)
+        matrix = np.round(matrix)
         result.append(matrix)
         matrix = np.zeros(size)  # new matrix
         index += 1
+
     return result

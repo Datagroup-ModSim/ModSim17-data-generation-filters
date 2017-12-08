@@ -10,6 +10,8 @@ class FileReader:
     def __init__(self, input_directory, glob_pattern):
         self.index = 0
         self.input_file_names = get_input_file_names(input_directory, glob_pattern)
+        print(self.input_file_names)
+        print(len(self.input_file_names))
         self.is_finished = False
 
     def increment_index(self):
@@ -64,7 +66,7 @@ def get_input_file_names(path, glob_pattern):
     :type glob_pattern: [str]
     :return: List of relative path to input file locations :type [str]
     """
-    trajectories_files = glob(path + '/' + glob_pattern[0], recursive=True)
+    trajectories_files = glob(path + '/' + glob_pattern[0], recursive=False)
     #velocity_files = glob(path + '/' + glob_pattern[1], recursive=True)
     return trajectories_files#list(zip(trajectories_files, velocity_files))
 
