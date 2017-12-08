@@ -8,7 +8,7 @@ Created on Sat Dec  2 16:31:27 2017
 import numpy as np
 import numpy.linalg as lin
 
-from src.filter.density_plot_tests import plot_density
+#from src.filter.density_plot_tests import plot_density
 
 def mainPCA(density_timeseries):
 
@@ -18,7 +18,7 @@ def mainPCA(density_timeseries):
     return density_timeseries
 
 
-def singlePCA(matrix, keepPercentage=90):
+def singlePCA(matrix, keepPercentage=99):
 
     # Matrix zentrieren
     # colMeans = np.mean(matrix, axis=0)
@@ -34,7 +34,7 @@ def singlePCA(matrix, keepPercentage=90):
 
     # Berechnen der zu behaltenden Singulärwerte um keepPercentage des Bildes zu behalten
     percentage = np.cumsum(s)/sum(s)*100    
-    modes = sum(percentage < keepPercentage)
+    modes = sum(percentage < keepPercentage) + 1
 
     # Wieder zusammensetzten der Matrix mit weniger Singulärwerten
     matrixReduced = np.dot(U[:, :modes], np.dot(S[:modes,:modes], V[:modes,:])).real # .clip(min=0)
@@ -42,6 +42,7 @@ def singlePCA(matrix, keepPercentage=90):
     return matrixReduced
 
 
+##################################Tests########################################
 def mainPCAtest(density_timeseries):
 
     #orginal = density_timeseries.copy()
@@ -75,7 +76,7 @@ def testPCA(matrix, keepPercentage, picture, i):
     S[:min(rlen, clen), :min(rlen, clen)] = np.diag(s)
     
     percentage = np.cumsum(s)/sum(s)*100    
-    modes = sum(percentage < keepPercentage)
+    modes = sum(percentage < keepPercentage) + 1
     matrixReduced = np.dot(U[:, :modes], np.dot(S[:modes,:modes], V[:modes,:])).real # .clip(min=0)
     
     mse = ((matrix - matrixReduced) ** 2).mean(axis=None)    
@@ -83,7 +84,6 @@ def testPCA(matrix, keepPercentage, picture, i):
     if picture == True:
         if(np.min(matrixReduced) < 0):
             matrixReduced = matrixReduced - np.min(matrixReduced)
-        describePicture = str(i) + "_" + str(keepPercentage) + str(modes) + str(np.max(mse))
-        plot_density(matrixReduced, "PCAreduced****", describePicture)
+        plot_density(matrixReduced, (str(i) + "_PCAreduced****"), ("_" + str(keepPercentage)))
     #plot_density(matrix, "****", "orginal")
     return mse, modes
