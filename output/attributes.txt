@@ -1,0 +1,32 @@
+# This file contains all information regarding the generated output data
+
+# Datatype
+gaussian density
+
+# script version tag
+1.0
+
+SCENARIO SIZE
+[50, 60]
+
+# OBSERVATION AREA
+[0, 0, 50, 60]
+
+# TIME STEP_BOUNDS
+[1, 473]
+
+# RESOLUTION 
+0.5
+
+# SIGMA
+0.7
+
+# GAUSS_DENSITY BOUNDS
+(2, 2)
+
+# FRAMERATE
+1
+
+# scenarios used
+[' \0.01-0.23333333-0.75666666_Distribution_2017-11-19_19-40-07.979\\postvis.trajectories', ' \0.016666668-0.58-0.40333334_Distribution_2017-11-19_19-36-20.419\\postvis.trajectories', ' \0.028333334-0.19833334-0.7733333_Distribution_2017-11-19_19-38-14.487\\postvis.trajectories', ' \0.03-0.043333333-0.9266667_Distribution_2017-11-19_19-40-08.414\\postvis.trajectories', ' \0.035-0.195-0.77_Distribution_2017-11-19_19-38-13.594\\postvis.trajectories', ' \0.036666665-0.53-0.43333334_Distribution_2017-11-19_19-36-17.932\\postvis.trajectories', ' \0.046666667-0.35-0.60333335_Distribution_2017-11-19_19-36-17.832\\postvis.trajectories', ' \0.06333333-0.11666667-0.82_Distribution_2017-11-19_19-36-19.717\\postvis.trajectories', ' \0.10166667-0.1-0.79833335_Distribution_2017-11-19_19-38-14.285\\postvis.trajectories', ' \0.10333333-0.34166667-0.555_Distribution_2017-11-19_19-40-08.70\\postvis.trajectories', ' \0.12833333-0.7183333-0.15333334_Distribution_2017-11-19_19-38-13.268\\postvis.trajectories', ' \0.13333334-0.07833333-0.78833336_Distribution_2017-11-19_19-36-18.845\\postvis.trajectories', ' \0.15833333-0.66-0.18166667_Distribution_2017-11-19_19-38-15.497\\postvis.trajectories', ' \0.16333333-0.0033333334-0.8333333_Distribution_2017-11-19_19-38-12.611\\postvis.trajectories', ' \0.21666667-0.63666666-0.14666666_Distribution_2017-11-19_19-40-06.857\\postvis.trajectories', ' \0.21833333-0.745-0.036666665_Distribution_2017-11-19_19-38-12.490\\postvis.trajectories', ' \0.25333333-0.175-0.57166666_Distribution_2017-11-19_19-38-15.292\\postvis.trajectories', ' \0.29166666-0.6016667-0.10666667_Distribution_2017-11-19_19-40-10.10\\postvis.trajectories', ' \0.30166668-0.40833333-0.29_Distribution_2017-11-19_19-40-09.747\\postvis.trajectories', ' \0.325-0.225-0.45_Distribution_2017-11-19_19-36-20.893\\postvis.trajectories', ' \0.35166666-0.086666666-0.56166667_Distribution_2017-11-19_19-36-17.121\\postvis.trajectories', ' \0.36-0.30166668-0.33833334_Distribution_2017-11-19_19-36-19.674\\postvis.trajectories', ' \0.36-0.405-0.235_Distribution_2017-11-19_19-40-09.312\\postvis.trajectories', ' \0.375-0.068333335-0.5566667_Distribution_2017-11-19_19-38-15.242\\postvis.trajectories', ' \0.37666667-0.35833332-0.265_Distribution_2017-11-19_19-38-12.390\\postvis.trajectories', ' \0.385-0.58-0.035_Distribution_2017-11-19_19-40-07.275\\postvis.trajectories', ' \0.38666666-0.28-0.33333334_Distribution_2017-11-19_19-38-13.541\\postvis.trajectories', ' \0.395-0.175-0.43_Distribution_2017-11-19_19-40-08.930\\postvis.trajectories', ' \0.405-0.18-0.415_Distribution_2017-11-19_19-36-18.637\\postvis.trajectories', ' \0.405-0.50166667-0.093333334_Distribution_2017-11-19_19-38-15.867\\postvis.trajectories', ' \0.46166667-0.48833334-0.05_Distribution_2017-11-19_19-40-09.353\\postvis.trajectories', ' \0.47-0.195-0.335_Distribution_2017-11-19_19-36-18.439\\postvis.trajectories', ' \0.515-0.24333334-0.24166666_Distribution_2017-11-19_19-38-13.945\\postvis.trajectories', ' \0.545-0.22333333-0.23166667_Distribution_2017-11-19_19-36-20.467\\postvis.trajectories', ' \0.55333334-0.30833334-0.13833334_Distribution_2017-11-19_19-40-06.553\\postvis.trajectories', ' \0.5883333-0.026666667-0.385_Distribution_2017-11-19_19-40-09.952\\postvis.trajectories', ' \0.59166664-0.065-0.34333333_Distribution_2017-11-19_19-36-20.271\\postvis.trajectories', ' \0.5933333-0.068333335-0.33833334_Distribution_2017-11-19_19-40-06.617\\postvis.trajectories', ' \0.6116667-0.17-0.21833333_Distribution_2017-11-19_19-40-08.565\\postvis.trajectories', ' \0.62333333-0.32666665-0.05_Distribution_2017-11-19_19-38-12.907\\postvis.trajectories', ' \0.62833333-0.36333334-0.008333334_Distribution_2017-11-19_19-38-13.874\\postvis.trajectories', ' \0.64-0.33333334-0.026666667_Distribution_2017-11-19_19-36-19.289\\postvis.trajectories', ' \0.64166665-0.083333336-0.275_Distribution_2017-11-19_19-40-09.168\\postvis.trajectories', ' \0.6666667-0.285-0.048333332_Distribution_2017-11-19_19-38-13.724\\postvis.trajectories', ' \0.7266667-0.15666667-0.11666667_Distribution_2017-11-19_19-40-07.454\\postvis.trajectories', ' \0.72833335-0.19833334-0.07333333_Distribution_2017-11-19_19-36-19.78\\postvis.trajectories', ' \0.73833334-0.22333333-0.038333334_Distribution_2017-11-19_19-40-08.583\\postvis.trajectories', ' \0.74666667-0.19166666-0.061666667_Distribution_2017-11-19_19-38-14.645\\postvis.trajectories', ' \0.74666667-0.20166667-0.051666666_Distribution_2017-11-19_19-36-18.195\\postvis.trajectories', ' \0.75333333-0.093333334-0.15333334_Distribution_2017-11-19_19-40-07.727\\postvis.trajectories', ' \0.765-0.10666667-0.12833333_Distribution_2017-11-19_19-36-19.489\\postvis.trajectories', ' \0.7733333-0.20333333-0.023333333_Distribution_2017-11-19_19-36-19.534\\postvis.trajectories', ' \0.8-0.105-0.095_Distribution_2017-11-19_19-38-14.921\\postvis.trajectories', ' \0.8233333-0.13833334-0.038333334_Distribution_2017-11-19_19-36-18.120\\postvis.trajectories', ' \0.83-0.021666666-0.14833333_Distribution_2017-11-19_19-40-07.607\\postvis.trajectories', ' \0.8566667-0.038333334-0.105_Distribution_2017-11-19_19-38-15.833\\postvis.trajectories', ' \0.8983333-0.038333334-0.06333333_Distribution_2017-11-19_19-36-17.513\\postvis.trajectories', ' \0.935-0.011666667-0.053333335_Distribution_2017-11-19_19-36-17.309\\postvis.trajectories', ' \0.97-0.026666667-0.0033333334_Distribution_2017-11-19_19-40-09.906\\postvis.trajectories', ' \0.97333336-0.021666666-0.005_Distribution_2017-11-19_19-38-14.253\\postvis.trajectories']
+
