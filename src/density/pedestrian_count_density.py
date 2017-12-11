@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from src.io.density_writer import write_matrix_to_file
+from src.io.file_writer import write_matrix_to_file
 
 INDEX_TIME_STEP = 0
 INDEX_PED_ID = 1
