@@ -13,10 +13,10 @@ VERSION = 1.1
 
 INPUT_DIRECTORY = os.path.join('input')  # directory to read imput files from
 OUTPUT_DIRECTORY = os.path.join('output')  # directory to write output files to
-INPUT_FILE_GLOB_PATTERN = ['/**/**/*.trajectories', '**/output_ts_pid.txt']
+INPUT_FILE_GLOB_PATTERN = ['/**/*.trajectories', '**/output_ts_pid.txt']
 SCENARIO_SIZE = [50,60]
 # select data from observed area, [offset_x, offset_y, width, height]
-OBSERVATION_AREA0 = [0, 0, 50, 60]
+OBSERVATION_AREA0 = [0, 0, 40, 80]
 OBSERVATION_AREA1 = [20, 10, 10, 10]
 OBSERVATION_AREA2 = [20, 15, 10, 10]
 OBSERVATION_AREA3 = [20, 20, 10, 10]
@@ -28,9 +28,10 @@ RECORDING_DENSITY_PERCENT = 80
 CALCULATE_VELOCITY = False
 
 
-def run_density_calculations(observation_area, sub_output_folder):
+def run_density_calculations(observation_area, sub_input_folder, sub_output_folder):
     unique_id = 0
-    trajectory_reader = FileReader(INPUT_DIRECTORY, INPUT_FILE_GLOB_PATTERN)
+    trajectory_reader = FileReader(sub_input_folder, INPUT_FILE_GLOB_PATTERN)
+    print(len(trajectory_reader.input_file_names))
     while not trajectory_reader.is_finished:
         data, current_input_directory = trajectory_reader.get_next_data(observation_area,
                                                                         FRAMERATE,
@@ -77,7 +78,7 @@ def run_trajectories_formatter(observation_area):
 # Main
 # ----------------------------------------------------------------------------------------------------------------------
 
-observation_areas = [OBSERVATION_AREA0]
+observation_areas = [[25,10,10,5],[25,15,10,5],[25,20,10,5]]
 
 folders = os.listdir(INPUT_DIRECTORY)
 print(folders)
@@ -89,6 +90,8 @@ for folder in folders:
     for i in range(0, len(observation_areas)):
         output_folder_name = ped_count + "_" + tags.format(i+1)
         sub_output_folder = os.path.join(OUTPUT_DIRECTORY, output_folder_name)
+        sub_input_folder = os.path.join(INPUT_DIRECTORY, folder)
         os.makedirs(sub_output_folder)
-        run_density_calculations(observation_areas[i], sub_output_folder)
+        print(sub_output_folder)
+        run_density_calculations(observation_areas[i], sub_input_folder, sub_output_folder)
 

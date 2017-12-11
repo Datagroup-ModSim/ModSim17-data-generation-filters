@@ -75,7 +75,7 @@ def group_by_time_step(data):
     :return: Grouped data :type [[[int, int, float, float, int, float, float, float]]]
     """
     minimum = get_minimum_time_step(data)
-    maximum = get_maximum_pedestrian_id(data)
+    maximum = get_maximum_time_step(data)
     return group_by(data, INDEX_TIME_STEP, minimum, maximum)
 
 def group_by_pedestrian_id(data):
@@ -138,7 +138,8 @@ def get_minimum_time_step(data):
     :type [[int, int, float, float, int, float, float, float]]
     :return: Minimum time-step :type int
     """
-    return min(get_time_steps(data))
+    time_steps = get_time_steps(data)
+    return min(time_steps)
 
 def get_maximum_time_step(data):
     """
@@ -147,7 +148,8 @@ def get_maximum_time_step(data):
     :type [[int, int, float, float, int, float, float, float]]
     :return: Maximum time-step :type int
     """
-    return max(get_time_steps(data))
+    time_steps = get_time_steps(data)
+    return max(time_steps)
 
 def get_pedestrian_ids(data):
     """
@@ -167,7 +169,8 @@ def get_minimum_pedestrian_id(data):
     :type pedestrian_ids: [int]
     :return: Minimum pedestrian-id :type int
     """
-    return min(get_pedestrian_ids(data))
+    ped_ids = get_pedestrian_ids(data)
+    return min(ped_ids)
 
 def get_maximum_pedestrian_id(data):
     """
@@ -177,7 +180,8 @@ def get_maximum_pedestrian_id(data):
     :type pedestrian_ids: [int]
     :return: Maximum pedestrian-id :type int
     """
-    return max(get_pedestrian_ids(data))
+    ped_ids = get_pedestrian_ids(data)
+    return max(ped_ids)
 
 # extracts the observation area of the camera from the data
 def extract_observation_area(data, area):
