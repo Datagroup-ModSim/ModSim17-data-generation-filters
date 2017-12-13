@@ -8,6 +8,7 @@ from src.trajectories.trajectories_formatter import format_trajectories
 from src.util.helper import calculate_total_target_distribution, calculate_momentary_target_distributions
 from src.filter.pca import mainPCA
 import os
+import shutil
 
 VERSION = 1.1
 
@@ -32,6 +33,7 @@ def run_density_calculations(observation_area, sub_input_folder, sub_output_fold
     unique_id = 0
     trajectory_reader = FileReader(sub_input_folder, INPUT_FILE_GLOB_PATTERN)
     print(len(trajectory_reader.input_file_names))
+    test_dist = []
     while not trajectory_reader.is_finished:
         data, current_input_directory = trajectory_reader.get_next_data(observation_area,
                                                                         FRAMERATE,
@@ -48,7 +50,7 @@ def run_density_calculations(observation_area, sub_input_folder, sub_output_fold
         #density_timeseries = mainPCA(density_timeseries)
 
         total_target_distribution = calculate_total_target_distribution(data)
-
+        test_dist.append(total_target_distribution)
         momentary_target_distributions = calculate_momentary_target_distributions(data)
 
         unique_id = write_density_timeseries(density_timeseries, sub_output_folder,
@@ -57,7 +59,8 @@ def run_density_calculations(observation_area, sub_input_folder, sub_output_fold
 
     density_constants = [RESOLUTION, SIGMA, GAUSS_DENSITY_BOUNDS, FRAMERATE]
     generate_attributes_file_density(trajectory_reader.input_file_names,observation_area, sub_output_folder, SCENARIO_SIZE, density_constants)
-
+    print(trajectory_reader.input_file_names)
+    print(test_dist)
 
 # files_used,observation_area, output_path, scenario_size, section_density_values
 def run_trajectories_formatter(observation_area):
@@ -78,20 +81,29 @@ def run_trajectories_formatter(observation_area):
 # Main
 # ----------------------------------------------------------------------------------------------------------------------
 
-observation_areas = [[25,10,10,5],[25,15,10,5],[25,20,10,5]]
+if True:
+    observation_areas = [OBSERVATION_AREA1,OBSERVATION_AREA2,OBSERVATION_AREA3]
 
-folders = os.listdir(INPUT_DIRECTORY)
-print(folders)
-tags = "pos{0}"
+    folders = os.listdir(INPUT_DIRECTORY)
+    print(folders)
+    tags = "pos{0}"
 
-for folder in folders:
-    ped_count = folder[0:3]
+    for folder in folders:
+        ped_count = folder[0:3]
 
-    for i in range(0, len(observation_areas)):
-        output_folder_name = ped_count + "_" + tags.format(i+1)
-        sub_output_folder = os.path.join(OUTPUT_DIRECTORY, output_folder_name)
-        sub_input_folder = os.path.join(INPUT_DIRECTORY, folder)
-        os.makedirs(sub_output_folder)
-        print(sub_output_folder)
-        run_density_calculations(observation_areas[i], sub_input_folder, sub_output_folder)
+        for i in range(0, len(observation_areas)):
+            output_folder_name = ped_count + "_" + tags.format(i+1)
+            sub_output_folder = os.path.join(OUTPUT_DIRECTORY, output_folder_name)
+            sub_input_folder = os.path.join(INPUT_DIRECTORY, folder)
+            os.makedirs(sub_output_folder)
+            print(sub_output_folder)
+            run_density_calculations(observation_areas[i], sub_input_folder, sub_output_folder)
 
+
+if False:
+    folders = os.listdir(OUTPUT_DIRECTORY)
+    print(folders)
+    for folder in folders:
+        base_dir = os.path.join(OUTPUT_DIRECTORY, folder)
+        print(base_dir)
+        shutil.make_archive(base_dir, "zip", base_dir)

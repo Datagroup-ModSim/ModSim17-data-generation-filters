@@ -45,7 +45,13 @@ def write_trajectories_formatted(trajectory_formatted, current_output_directory,
 
 
 def get_output_file_name(distribution, name='_density'):
-    return str(int(distribution[0])) + '-' + str(int(distribution[1])) + '-' + str(int(distribution[2])) + name
+    distribution_str = ""
+    for i in range(0,len(distribution)):
+        distribution_str += str(np.round(distribution[i],0))
+        if i < len(distribution) - 1: # dont append "-" after last dist
+            distribution_str += '-'
+
+    return distribution_str + name
 
 
 

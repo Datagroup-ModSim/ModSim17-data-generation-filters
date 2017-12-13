@@ -9,6 +9,8 @@ INDEX_VELOCITY_ABSOULTE = 5
 INDEX_VELOCITY_X = 6
 INDEX_VELOCITY_Y = 7
 
+NUMBER_OF_TARGETS = 3
+
 def sort_by(data, key):
     """
     Sort data by given criteria.
@@ -222,31 +224,44 @@ def calculate_momentary_target_distributions(data):
     return result
 
 
-def calculate_total_target_distribution(data):
+def four_targets_distribution(data, target_ids):
+    total_distribution = [0, 0, 0, 0]
+    if len(target_ids) < 4:
+        target_ids = [1,2,3,4]
+    for row in data:
+        if row[INDEX_TARGET_ID] == target_ids[0]:
+            total_distribution[0] = total_distribution[0] + 1
+        elif row[INDEX_TARGET_ID] == target_ids[1]:
+            total_distribution[1] = total_distribution[1] + 1
+        elif row[INDEX_TARGET_ID] == target_ids[2]:
+            total_distribution[2] = total_distribution[2] + 1
+        else:
+            total_distribution[3] = total_distribution[3] + 1
+
+    return total_distribution
+
+def three_targets_distribution(data,target_ids):
     total_distribution = [0, 0, 0]
-    length = len(data)
-    target_ids = list(np.array(data)[:, -1])
-    target_ids = list(set(target_ids))
-    number_of_targets = len(target_ids)
-
-    if number_of_targets > 4:
-        raise ValueError
-
     for row in data:
         if row[INDEX_TARGET_ID] == target_ids[0]:
             total_distribution[0] = total_distribution[0] + 1
         elif row[INDEX_TARGET_ID] == target_ids[1]:
             total_distribution[1] = total_distribution[1] + 1
         else:
-            if number_of_targets == 3:
-                total_distribution[2] = total_distribution[2] + 1
-            else:
-                if row[INDEX_TARGET_ID] == target_ids[2]:
-                    total_distribution[2] == total_distribution[2] + 1
-                else:
-                    total_distribution[3] == total_distribution[3] + 1
+            total_distribution[2] = total_distribution[2] + 1
+
+    return total_distribution
 
 
+def calculate_total_target_distribution(data):
+    length = len(data)
+    target_ids = list(np.array(data)[:, -1])
+    target_ids = list(set(target_ids))
+    total_distribution = []
+    if NUMBER_OF_TARGETS == 3:
+        total_distribution = three_targets_distribution(data,target_ids)
+    elif NUMBER_OF_TARGETS == 4:
+        total_distribution = four_targets_distribution(data,target_ids)
 
     total_distribution[:] = [round(count / length, 2) * 100 for count in total_distribution]
     return total_distribution
