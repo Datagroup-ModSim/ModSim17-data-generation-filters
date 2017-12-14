@@ -8,27 +8,52 @@ Created on Sat Dec  2 16:31:27 2017
 import numpy as np
 import numpy.linalg as lin
 
-#from src.filter.density_plot_tests import plot_density
+from src.filter.density_plot_tests import plot_density
 
 def mainPCA(density_timeseries, keepPercentage=99, centerMatrix=False, meanMatrix=False):
-    
-    U = [None] * len(density_timeseries)
-    s = [None] * len(density_timeseries)
-    V = [None] * len(density_timeseries)
+# =============================================================================
+# Durchführen einer Hauptkomponentenanalyse
+# Übergabewerte:
+# density_timeseries: Liste aus Matrizen der Dichtedaten
+# keepPercetage: Prozentualer Anteil an Informationen der behalten werden soll
+# centerMatrix: Bei True wird die Matrix vor der Zerlegung Zentriert
+# meanMatrix: Bei True wird der Mittelwert von allen Matrizen aus
+#             density_timeseries berechnet und von jeder Matix subrahiert
+# Ausgabewerte:
+# PCA: Aus U^T, s, V^T zusammengesetzte Matrix
+# Optional können auch die Listen aller U (linke Singulärvektoren), 
+# s (Singulärwerte) und V(rechte Singulärvektoren) ausgegeben werden
+# =============================================================================
 
+    # Liste für Matrizen mit linken Singulärvektoren
+    U = [None] * len(density_timeseries)
+    # Liste für Vektoren mit Singulärwerten
+    s = [None] * len(density_timeseries)
+    # Liste für Matrizen mit rechten
+    V = [None] * len(density_timeseries)
+    PCA = [None] * len(density_timeseries)
+
+    # Berechnen der durchschnittlichen Matrix aller Zeitschritte falls gewünscht
     if meanMatrix:
         meanMatrix = calculate_Mean_Matrix(density_timeseries)    
-    
+
+    # Berechnen der PCA aller Matrizen
     for i in range(0, len(density_timeseries)):
         matrix = density_timeseries[i]
         if meanMatrix:
             matrix = matrix - meanMatrix
         U[i], s[i], V[i] = singlePCA(matrix, keepPercentage, centerMatrix)
+        PCA[i] = np.concatenate((np.transpose(U[i]), s[i], V[i]), axis=1)
 
-    return U, s, V
+    return PCA
+    # return U, s, V
+    
 
 
 def singlePCA(matrix, keepPercentage=99, centerMatrix=False):
+    # Berechnen der PCA für eine Matrix bei der keepPercentage der 
+    # Originalinformation behalten werden und die Matrix optional
+    # vor der Zerlegung zentriert wird.
 
     # Matrix zentrieren
     if centerMatrix is True:
@@ -42,6 +67,7 @@ def singlePCA(matrix, keepPercentage=99, centerMatrix=False):
     percentage = np.cumsum(s) / sum(s) * 100
     modes = sum(percentage < keepPercentage) + 1
 
+    # Abschneiden der reduzierten Matrizen
     U = U[:, :modes]
     s = s[:modes]
     V = V[:modes, :]
