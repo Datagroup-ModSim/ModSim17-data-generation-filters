@@ -47,9 +47,9 @@ def run_density_calculations(observation_area, sub_input_folder, sub_output_fold
 
         #density_timeserie_filtered = filter_data(density_timeseries)
 
-        if False:
-            U, s, V = mainPCA(density_timeseries)
-            #Speichern der Matrizen
+        # Calculate PCA
+        density_timeseries = mainPCA(density_timeseries)
+            
 
         total_target_distribution = calculate_total_target_distribution(data)
         test_dist.append(total_target_distribution)

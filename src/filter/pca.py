@@ -31,6 +31,8 @@ def mainPCA(density_timeseries, keepPercentage=99, centerMatrix=False, meanMatri
     s = [None] * len(density_timeseries)
     # Liste für Matrizen mit rechten
     V = [None] * len(density_timeseries)
+    
+    modes = [None] * len(density_timeseries)
     PCA = [None] * len(density_timeseries)
 
     # Berechnen der durchschnittlichen Matrix aller Zeitschritte falls gewünscht
@@ -42,12 +44,50 @@ def mainPCA(density_timeseries, keepPercentage=99, centerMatrix=False, meanMatri
         matrix = density_timeseries[i]
         if meanMatrix:
             matrix = matrix - meanMatrix
-        U[i], s[i], V[i] = singlePCA(matrix, keepPercentage, centerMatrix)
-        PCA[i] = np.concatenate((np.transpose(U[i]), s[i], V[i]), axis=1)
+        U[i], s[i], V[i], modes[i] = PCA_just_Decomposition(matrix, keepPercentage, centerMatrix)
+    PCA = PCA_with_Max_Modes(U, s, V, modes)
+    #PCA[i] = np.concatenate((np.transpose(U[i]), s[i], V[i]), axis=1)
 
     return PCA
     # return U, s, V
     
+
+def PCA_with_Max_Modes(U, s, V, modes):
+    # Abschneiden der Matrizen bei modes
+
+    PCA = [None] * len(modes)
+    maxMode = np.max(modes)
+
+    for i in range(0, len(modes)):
+        U[i] = U[i][:, :maxMode]
+        S = np.array([s[i][:maxMode]])
+        V[i] = V[i][:maxMode, :]
+        PCA[i] = np.concatenate((U[i], S, V[i].T), axis=0)
+        PCA[i] = np.around(PCA[i], 4)
+        #PCA[i] = np.concatenate((singleU, np.transpose(singleS)), axis=0)
+        #PCA[i] = np.concatenate((PCA[i], np.transpose(singleV)), axis=0)
+
+    return PCA
+
+
+def PCA_just_Decomposition(matrix, keepPercentage=99, centerMatrix=False):
+    # Berechnen der PCA Zerlegung für eine Matrix bei der keepPercentage der 
+    # Originalinformation behalten werden und die Matrix optional
+    # vor der Zerlegung zentriert wird.
+
+    # Matrix zentrieren
+    if centerMatrix is True:
+        colMeans = np.mean(matrix, axis=0)
+        matrix = matrix - colMeans
+
+    # Singulärwertzerlegung
+    U, s, V = lin.svd(matrix)
+
+    # Berechnen der zu behaltenden Singulärwerte um keepPercentage des Bildes zu behalten
+    percentage = np.cumsum(s) / sum(s) * 100
+    modes = sum(percentage < keepPercentage) + 1
+    
+    return U, s, V, modes
 
 
 def singlePCA(matrix, keepPercentage=99, centerMatrix=False):
@@ -82,6 +122,11 @@ def calculate_Mean_Matrix(density_timeseries):
 
 
 ##################################Tests########################################
+# Diese Fuktionen führen die selben Aufgaben aus wie die Oberen, jedoch werden 
+# hier statt der zerlegten Matrix Bilder der originalen und wieder 
+# zusammengesetzten  reduzierten Matrix erzeugt und der durchschnittliche 
+# quadratische Fehler berechnet.
+
 def mainPCAtest(density_timeseries, mean, central):
 
     # orginal = density_timeseries.copy()
