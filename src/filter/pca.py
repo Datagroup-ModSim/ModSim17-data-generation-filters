@@ -10,7 +10,9 @@ import numpy.linalg as lin
 
 from src.filter.density_plot_tests import plot_density
 
-def mainPCA(density_timeseries, keepPercentage=99, centerMatrix=False, meanMatrix=False):
+def mainPCA(density_timeseries, keepPercentage=99, keepModes=0, substractTimesteps=False, \
+            addTimesteps=0, addMultibleTimesteps=0, centerMatrix=False, \
+            meanMatrix=False, recombine=False):
 # =============================================================================
 # Durchführen einer Hauptkomponentenanalyse
 # Übergabewerte:
@@ -25,47 +27,70 @@ def mainPCA(density_timeseries, keepPercentage=99, centerMatrix=False, meanMatri
 # s (Singulärwerte) und V(rechte Singulärvektoren) ausgegeben werden
 # =============================================================================
 
+    length = len(density_timeseries)
     # Liste für Matrizen mit linken Singulärvektoren
-    U = [None] * len(density_timeseries)
+    U = [None] * length
     # Liste für Vektoren mit Singulärwerten
-    s = [None] * len(density_timeseries)
+    s = [None] * length
     # Liste für Matrizen mit rechten
-    V = [None] * len(density_timeseries)
+    V = [None] * length
     
-    modes = [None] * len(density_timeseries)
-    PCA = [None] * len(density_timeseries)
+    modes = [None] * length
+    PCA = [None] * length
 
     # Berechnen der durchschnittlichen Matrix aller Zeitschritte falls gewünscht
     if meanMatrix:
-        meanMatrix = calculate_Mean_Matrix(density_timeseries)    
+        meansMatrix = calculate_Mean_Matrix(density_timeseries)    
 
     # Berechnen der PCA aller Matrizen
     for i in range(0, len(density_timeseries)):
         matrix = density_timeseries[i]
         if meanMatrix:
-            matrix = matrix - meanMatrix
+            matrix = matrix - meansMatrix
         U[i], s[i], V[i], modes[i] = PCA_just_Decomposition(matrix, keepPercentage, centerMatrix)
-    PCA = PCA_with_Max_Modes(U, s, V, modes)
+    if(keepModes != 0):
+        mode = keepModes
+    else:
+        mode = np.max(modes)
+    PCA = PCA_with_Max_Modes(U, s, V, mode, recombine)
     #PCA[i] = np.concatenate((np.transpose(U[i]), s[i], V[i]), axis=1)
+    
+    if(substractTimesteps):
+        PCA = substract_Timesteps(PCA)
 
-    return PCA
+    if(addTimesteps > 0):
+        PCA = add_Timesteps(PCA, addTimesteps)
+
+    if(addMultibleTimesteps > 0):
+        PCA = add_Multible_Timesteps(PCA, addMultibleTimesteps)
+
+    return PCA, mode
     # return U, s, V
     
 
-def PCA_with_Max_Modes(U, s, V, modes):
+def PCA_with_Max_Modes(U, s, V, maxMode, recombine):
     # Abschneiden der Matrizen bei modes
 
-    PCA = [None] * len(modes)
-    maxMode = np.max(modes)
+    PCA = [None] * len(U)
+    #maxMode = np.max(modes)
+    #maxMode = 10
 
-    for i in range(0, len(modes)):
+    for i in range(0, len(U)):
         U[i] = U[i][:, :maxMode]
         S = np.array([s[i][:maxMode]])
         V[i] = V[i][:maxMode, :]
-        PCA[i] = np.concatenate((U[i], S, V[i].T), axis=0)
+
+        if(recombine is False):
+            PCA[i] = np.concatenate((U[i], S, V[i].T), axis=0)
+
+        if(recombine):
+            #Si = np.zeros((maxMode, maxMode), dtype=complex)
+            #Si[:maxMode, :maxMode] = np.diag(S)
+            Si = np.diag(s[i][:maxMode])
+            PCA[i] = np.dot(U[i], np.dot(Si, V[i])).real
+
         PCA[i] = np.around(PCA[i], 4)
-        #PCA[i] = np.concatenate((singleU, np.transpose(singleS)), axis=0)
-        #PCA[i] = np.concatenate((PCA[i], np.transpose(singleV)), axis=0)
+        
 
     return PCA
 
@@ -90,29 +115,32 @@ def PCA_just_Decomposition(matrix, keepPercentage=99, centerMatrix=False):
     return U, s, V, modes
 
 
-def singlePCA(matrix, keepPercentage=99, centerMatrix=False):
-    # Berechnen der PCA für eine Matrix bei der keepPercentage der 
-    # Originalinformation behalten werden und die Matrix optional
-    # vor der Zerlegung zentriert wird.
+def substract_Timesteps(PCA):
 
-    # Matrix zentrieren
-    if centerMatrix is True:
-        colMeans = np.mean(matrix, axis=0)
-        matrix = matrix - colMeans
+    PCA_sub = [None] * (len(PCA) - 1)
+    for i in range(0, (len(PCA) - 1)):
+        sub = PCA[i+1] - PCA[i]
+        PCA_sub[i] = np.concatenate((PCA[i+1], sub), axis=0)
+    return PCA_sub
 
-    # Singulärwertzerlegung
-    U, s, V = lin.svd(matrix)
 
-    # Berechnen der zu behaltenden Singulärwerte um keepPercentage des Bildes zu behalten
-    percentage = np.cumsum(s) / sum(s) * 100
-    modes = sum(percentage < keepPercentage) + 1
+def add_Timesteps(PCA, addTimesteps):
 
-    # Abschneiden der reduzierten Matrizen
-    U = U[:, :modes]
-    s = s[:modes]
-    V = V[:modes, :]
+    PCA_add = [None] * (len(PCA) - addTimesteps)
+    for i in range(0, (len(PCA) - addTimesteps)):
+        add = sum(PCA[i:(i+addTimesteps+1)])
+        PCA_add[i] = np.concatenate((PCA[i+addTimesteps], add), axis=0)
+    return PCA_add
 
-    return U, s, V 
+
+def add_Multible_Timesteps(PCA, addTimesteps):
+
+    PCA_add = [None] * (len(PCA) - addTimesteps)
+    for i in range(0, (len(PCA) - addTimesteps)):
+        PCA_add[i] = PCA[i]
+        for j in range(2, addTimesteps+2):
+            PCA_add[i] = np.concatenate((PCA_add[i], sum(PCA[i:(i+j)])),axis=0)
+    return PCA_add
 
 
 def calculate_Mean_Matrix(density_timeseries):
@@ -127,60 +155,23 @@ def calculate_Mean_Matrix(density_timeseries):
 # zusammengesetzten  reduzierten Matrix erzeugt und der durchschnittliche 
 # quadratische Fehler berechnet.
 
-def mainPCAtest(density_timeseries, mean, central):
 
-    # orginal = density_timeseries.copy()
-    mse = [None] * len(density_timeseries) * 5
-    modes = [None] * len(density_timeseries) * 5
-    
-    if mean is True:
-        meanMatrix = calculate_Mean_Matrix(density_timeseries)
+def mainPCAtest(density_timeseries, keepPercentage=99, substractTimesteps=False,\
+                addTimesteps=0, addMultibleTimesteps=0, centerMatrix=False, \
+                meanMatrix=False, recombine=True):
+   
+   PCA = mainPCA(density_timeseries, keepPercentage=keepPercentage, \
+               substractTimesteps=substractTimesteps, \
+               addTimesteps=addTimesteps, \
+               addMultibleTimesteps=addMultibleTimesteps, \
+               centerMatrix=centerMatrix, meanMatrix=meanMatrix, \
+               recombine=recombine)
 
-    index = 0
-    for i in range(0, len(density_timeseries)):
-        if i % 50 == 0:
-            picture = True
-        else:
-            picture = False
-        for per in [99, 95, 90, 75, 50]:
-            matrix = density_timeseries[i]
-            if mean is True:
-                matrix = matrix - meanMatrix
-            mse[index], modes[index] = testPCA(matrix, per, picture, i, central)
-            if picture is True:
-                plot_density(density_timeseries[i], (str(i) + "_****"), "Orginal")
-            index += 1
+   for i in range(0, len(density_timeseries), 50):
+       plot_density(density_timeseries[i], (str(i) + "_****"), "Orginal")
+       plot_density(PCA[i], (str(i) + "_PCAreduced****"), ("_" + str(keepPercentage)))
+       mse = ((density_timeseries[i] - PCA[i]) ** 2).mean(axis=None)
 
-    return mse, modes
+   return mse
+   # return U, s, V
 
-
-def testPCA(matrix, keepPercentage, picture, i, centerMatrix):
-
-    # Matrix zentrieren
-    if centerMatrix is True:
-        colMeans = np.mean(matrix, axis=0)
-        matrix = matrix - colMeans
-
-    # Singulärwertzerlegung
-    U, s, V = lin.svd(matrix)
-
-    # Singulärwertevektor als Diagonalelemente in Matrix einsetzen
-    rlen, clen = matrix.shape
-    S = np.zeros((rlen, clen), dtype=complex)
-    S[:min(rlen, clen), :min(rlen, clen)] = np.diag(s)
-
-    # Berechnen der zu behaltenden Singulärwerte um keepPercentage des Bildes zu behalten
-    percentage = np.cumsum(s) / sum(s) * 100
-    modes = sum(percentage < keepPercentage) + 1
-
-    # Wieder zusammensetzten der Matrix mit weniger Singulärwerten
-    matrixReduced = np.dot(U[:, :modes], np.dot(S[:modes,:modes], V[:modes,:])).real # .clip(min=0)
-
-    mse = ((matrix - matrixReduced) ** 2).mean(axis=None)
-    # print(np.allclose(matrix, matrixReduced, rtol=1e2, atol=1e-3), modes)
-    if picture is True:
-        if(np.min(matrixReduced) < 0):
-            matrixReduced = matrixReduced - np.min(matrixReduced)
-        plot_density(matrixReduced, (str(i) + "_PCAreduced****"), ("_" + str(keepPercentage)))
-    # plot_density(matrix, "****", "orginal")
-    return mse, modes

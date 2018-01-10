@@ -29,7 +29,7 @@ RECORDING_DENSITY_PERCENT = 80
 CALCULATE_VELOCITY = False
 
 
-def run_density_calculations(observation_area, sub_input_folder, sub_output_folder):
+def run_density_calculations(observation_area, sub_input_folder, sub_output_folder, keepModesPCA):
     unique_id = 0
     trajectory_reader = FileReader(sub_input_folder, INPUT_FILE_GLOB_PATTERN)
     print(len(trajectory_reader.input_file_names))
@@ -48,10 +48,13 @@ def run_density_calculations(observation_area, sub_input_folder, sub_output_fold
         #density_timeserie_filtered = filter_data(density_timeseries)
 
         # Calculate PCA
-        density_timeseries = mainPCA(density_timeseries)
+        #density_timeseries, keepModesPCA = mainPCA(density_timeseries, keepPercentage=80, \
+        #    keepModes=keepModesPCA, substractTimesteps=False, addTimesteps=0, \
+        #    addMultibleTimesteps=5  , centerMatrix=False, meanMatrix=False, recombine=False)
             
 
         total_target_distribution = calculate_total_target_distribution(data)
+        total_target_distribution = [i * 100 for i in total_target_distribution]
         test_dist.append(total_target_distribution)
         momentary_target_distributions = calculate_momentary_target_distributions(data)
 
@@ -63,6 +66,7 @@ def run_density_calculations(observation_area, sub_input_folder, sub_output_fold
     generate_attributes_file_density(trajectory_reader.input_file_names,observation_area, sub_output_folder, SCENARIO_SIZE, density_constants)
     print(trajectory_reader.input_file_names)
     print(test_dist)
+    return keepModesPCA
 
 # files_used,observation_area, output_path, scenario_size, section_density_values
 def run_trajectories_formatter(observation_area):
@@ -89,6 +93,8 @@ if True:
     folders = os.listdir(INPUT_DIRECTORY)
     print(folders)
     tags = "pos{0}"
+    
+    keepModesPCA = 0
 
     for folder in folders:
         ped_count = folder[0:3]
@@ -99,7 +105,9 @@ if True:
             sub_input_folder = os.path.join(INPUT_DIRECTORY, folder)
             os.makedirs(sub_output_folder)
             print(sub_output_folder)
-            run_density_calculations(observation_areas[i], sub_input_folder, sub_output_folder)
+            keepModesPCA = run_density_calculations(observation_areas[i], sub_input_folder, \
+                sub_output_folder, keepModesPCA)
+    print(keepModesPCA)
 
 
 if False:
